@@ -1,12 +1,12 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("ddevernote.DataLayer.Sql.Tests")]
+[assembly: AssemblyTitle("DDEvernote.DataLayer.Sql.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("ddevernote.DataLayer.Sql.Tests")]
+[assembly: AssemblyProduct("DDEvernote.DataLayer.Sql.Tests")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

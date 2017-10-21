@@ -3,55 +3,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ddevernote.DataLayer;
-using ddevernote.Model;
+using DDEvernote.DataLayer;
+using DDEvernote.Model;
 using System.Data.SqlClient;
 
-namespace ddevernote.DataLayer.Sql
+namespace DDEvernote.DataLayer.Sql
 {
     public class NotesRepository : INotesRepository
     {
 
         private readonly string _connectionString;
-        private readonly ICategoriesRepository _categoriesRepository;
-        private readonly IUsersRepository _usersRepository;
 
-        public NotesRepository(String connectionString, ICategoriesRepository categoriesRepository, IUsersRepository usersRepository)
+        public NotesRepository(String connectionString)
         {
             _connectionString = connectionString;
-            _categoriesRepository = categoriesRepository;
-            _usersRepository = usersRepository;
         }
 
-        public Note AddNote(Guid categoryId, Guid noteId)
+        public void AddNoteInCategory(Guid categoryId, Guid noteId)
         {
+            ICategoriesRepository _categoriesRepository = new CategoriesRepository(_connectionString);
             using (var sqlConnection = new SqlConnection(_connectionString))
             {
-                Note note;
-                try
+                if (_categoriesRepository.IsExist(categoryId) && IsExist(noteId))
                 {
-                    Category category = _categoriesRepository.Get(categoryId);
-                    note = Get(noteId);
-                    foreach (var cat in note.Categories)
+                    sqlConnection.Open();
+                    using (var command = sqlConnection.CreateCommand())
                     {
-                        if (cat.Id == categoryId)
-                        {
-                            return note;
-                        }
+                        command.CommandText = "insert into category_notes values (@categoryId, @noteId)";
+                        command.Parameters.AddWithValue("@categoryid", categoryId);
+                        command.Parameters.AddWithValue("@noteId", noteId);
+                        command.ExecuteNonQuery();
                     }
-                }
-                catch (ArgumentException ex)
-                {
-                    throw ex;
-                }
-                sqlConnection.Open();
-                using (var command = sqlConnection.CreateCommand())
-                {
-                    command.CommandText = "insert into category_notes values (@categoryId, @noteId)";
-                    command.Parameters.AddWithValue("@categoryid", categoryId);
-                    command.Parameters.AddWithValue("@noteId", noteId);
-                    command.ExecuteNonQuery();
-                    return note;
                 }
             }
         }
@@ -69,7 +51,9 @@ namespace ddevernote.DataLayer.Sql
                     {
                         note.Text = "";
                     }
-                    command.CommandText = "insert into notes (id, user_id, title, text, created_time, changed_time) values  (@id, @user_id, @title, @text, @created_time, @changed_time);";
+                    command.CommandText = "insert into notes " +
+                        "(id, user_id, title, text, created_time, changed_time) " +
+                        "values  (@id, @user_id, @title, @text, @created_time, @changed_time);";
                     command.Parameters.AddWithValue("@id", note.Id);
                     command.Parameters.AddWithValue("@user_id", note.Owner.Id);
                     command.Parameters.AddWithValue("@title", note.Title);
@@ -81,22 +65,25 @@ namespace ddevernote.DataLayer.Sql
                 }
             }
         }
+
         public void Delete(Guid noteId)
         {
-
             using (var sqlConnection = new SqlConnection(_connectionString))
             {
                 sqlConnection.Open();
                 using (var command = sqlConnection.CreateCommand())
                 {
-                    command.CommandText = "delete from category_notes where note_id=@id; delete from shared where note_id=@id; delete from notes where id=@id";
-                    command.Parameters.AddWithValue("@id",noteId);
+                    command.CommandText = "delete from notes where id=@id";
+                    command.Parameters.AddWithValue("@id", noteId);
                     command.ExecuteNonQuery();
                 }
             }
         }
+
         public Note Get(Guid noteId)
         {
+            ICategoriesRepository _categoriesRepository = new CategoriesRepository(_connectionString);
+            IUsersRepository _usersRepository = new UsersRepository(_connectionString);
             using (var sqlConnection = new SqlConnection(_connectionString))
             {
                 sqlConnection.Open();
@@ -110,126 +97,185 @@ namespace ddevernote.DataLayer.Sql
                         {
                             throw new ArgumentException($"Note с id {noteId} не найден");
                         }
-                        var note = new Note
+                        return new Note
                         {
                             Id = new Guid(reader.GetString(reader.GetOrdinal("id"))),
                             Title = reader.GetString(reader.GetOrdinal("title")),
                             Owner = _usersRepository.Get(new Guid(reader.GetString(reader.GetOrdinal("user_id")))),
                             Text = reader.GetString(reader.GetOrdinal("text")),
                             Shared = _usersRepository.GetUsersBySharedNote(new Guid(reader.GetString(reader.GetOrdinal("id")))),
-                            Categories = _categoriesRepository.GetUserCategories(new Guid(reader.GetString(reader.GetOrdinal("id")))),
+                            Categories = _categoriesRepository.GetCategoriesOfNote(noteId),
                             Changed = reader.GetDateTime(reader.GetOrdinal("changed_time")),
                             Created = reader.GetDateTime(reader.GetOrdinal("created_time"))
                         };
-                        return note;
                     }
                 }
             }
         }
+        
         public IEnumerable<Note> GetUserNotes(Guid userId)
         {
-            User user;
-            try
+            ICategoriesRepository _categoriesRepository = new CategoriesRepository(_connectionString);
+            IUsersRepository _usersRepository = new UsersRepository(_connectionString);
+            if (_usersRepository.IsExist(userId))
             {
-                user = _usersRepository.Get(userId);
+                using (var sqlConnection = new SqlConnection(_connectionString))
+                {
+                    sqlConnection.Open();
+                    using (var command = sqlConnection.CreateCommand())
+                    {
+                        command.CommandText = "select * from notes where user_id=@userId";
+                        command.Parameters.AddWithValue("@userId", userId);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            var listOfNotes = new List<Note>();
+                            var owner = _usersRepository.Get(userId);
+                            while (reader.Read())
+                            {
+                                listOfNotes.Add(new Note
+                                {
+                                    Id = new Guid(reader.GetString(reader.GetOrdinal("id"))),
+                                    Title = reader.GetString(reader.GetOrdinal("title")),
+                                    Owner = owner,
+                                    Text = reader.GetString(reader.GetOrdinal("text")),
+                                    Shared = _usersRepository.GetUsersBySharedNote(new Guid(reader.GetString(reader.GetOrdinal("id")))),
+                                    Categories = _categoriesRepository.GetUserCategories(userId),
+                                    Changed = reader.GetDateTime(reader.GetOrdinal("changed_time")),
+                                    Created = reader.GetDateTime(reader.GetOrdinal("created_time"))
+                                });
+                            }
+                            return listOfNotes;
+                        }
+                    }
+                }
             }
-            catch (ArgumentException ex)
-            {
-                throw ex;
-            }
+            throw new ArgumentException($"Пользователя с id {userId} не существует");
+        }
 
+        public IEnumerable<Note> GetNotesByCategory(Guid categoryId)
+        {
+            ICategoriesRepository _categoriesRepository = new CategoriesRepository(_connectionString);
+            IUsersRepository _usersRepository = new UsersRepository(_connectionString);
             using (var sqlConnection = new SqlConnection(_connectionString))
             {
                 sqlConnection.Open();
                 using (var command = sqlConnection.CreateCommand())
                 {
-                    command.CommandText = "select * from notes where user_id=@userId";
-                    command.Parameters.AddWithValue("@userId", userId);
+                    command.CommandText = "select notes.id, notes.user_id, notes.title, notes.user_id, notes.text, notes.created_time, notes.changed_time " +
+                        "from notes inner join category_notes " +
+                        "on category_notes.note_id=notes.id " +
+                        "where category_notes.category_id=@categoryId;";
+                    command.Parameters.AddWithValue("@categoryId", categoryId);
                     using (var reader = command.ExecuteReader())
                     {
+                        var listOfNotes = new List<Note>();
                         while (reader.Read())
                         {
-
-
-                            yield return new Note
+                            listOfNotes.Add(new Note
                             {
                                 Id = new Guid(reader.GetString(reader.GetOrdinal("id"))),
                                 Title = reader.GetString(reader.GetOrdinal("title")),
-                                Owner = user,
+                                Owner = _usersRepository.Get(new Guid(reader.GetString(reader.GetOrdinal("user_id")))),
                                 Text = reader.GetString(reader.GetOrdinal("text")),
                                 Shared = _usersRepository.GetUsersBySharedNote(new Guid(reader.GetString(reader.GetOrdinal("id")))),
-                                Categories = _categoriesRepository.GetUserCategories(user.Id),
+                                Categories = _categoriesRepository.GetUserCategories(new Guid(reader.GetString(reader.GetOrdinal("user_id")))),
                                 Changed = reader.GetDateTime(reader.GetOrdinal("changed_time")),
                                 Created = reader.GetDateTime(reader.GetOrdinal("created_time"))
-                            };
+                            });
                         }
+                        return listOfNotes;
                     }
                 }
             }
         }
-        public IEnumerable<Note> GetUserNotesByCategory(Guid userId, string categoryName)
+
+        public bool IsExist(Guid noteId)
         {
-            using (var sqlConnection = new SqlConnection(_connectionString))
-            {
-                sqlConnection.Open();
-                using (var command = sqlConnection.CreateCommand())
-                {
-                    command.CommandText = "select notes.id, notes.user_id, notes.title, notes.text, notes.created_time, notes.changed_time from notes inner join category_notes on category_notes.note_id=notes.id inner join category on category_notes.category_id=category.id where category.user_id=@userId";
-                    command.Parameters.AddWithValue("@userId", userId);
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            yield return new Note
-                            {
-                                Id = new Guid(reader.GetString(reader.GetOrdinal("id"))),
-                                Title = reader.GetString(reader.GetOrdinal("title")),
-                                Owner = _usersRepository.Get(userId),
-                                Text = reader.GetString(reader.GetOrdinal("text")),
-                                Shared = _usersRepository.GetUsersBySharedNote(new Guid(reader.GetString(reader.GetOrdinal("id")))),
-                                Categories = _categoriesRepository.GetUserCategories(userId),
-                                Changed = reader.GetDateTime(reader.GetOrdinal("changed_time")),
-                                Created = reader.GetDateTime(reader.GetOrdinal("created_time"))
-                            };
-                        }
-                    }
-                }
-            }
-        }
-        public Note Update(Note note)
-        {
-            //TODO maybe redo this method for updating shared and category_note
             using (var sqlConnection = new SqlConnection(_connectionString))
             {
                 sqlConnection.Open();
                 using (var command = sqlConnection.CreateCommand())
                 {
                     command.CommandText = "select title from notes where id=@id";
-                    command.Parameters.AddWithValue("@id", note.Id);
+                    command.Parameters.AddWithValue("@id", noteId);
                     using (var reader = command.ExecuteReader())
                     {
-                        if (!reader.Read())
+                        if (reader.Read())
                         {
-                            throw new ArgumentException($"Заметка с id {note.Id} не найденa");
+                            return true;
                         }
+                        return false;
                     }
                 }
+            }
+        }
 
-
-                using (var command = sqlConnection.CreateCommand())
-                {note.Changed = DateTime.Now;
-                    if (note.Text == null)
+        public void Share(Guid noteId, Guid userId)
+        {
+            ICategoriesRepository _categoriesRepository = new CategoriesRepository(_connectionString);
+            IUsersRepository _usersRepository = new UsersRepository(_connectionString);
+            if (IsExist(noteId) && _usersRepository.IsExist(userId))
+            {
+                using (var sqlConnection = new SqlConnection(_connectionString))
+                {
+                    sqlConnection.Open();
+                    using (var command = sqlConnection.CreateCommand())
                     {
-                        note.Text = "";
+                        command.CommandText = "insert into shared " +
+                            "values (@noteId, @userId)";
+                        command.Parameters.AddWithValue("@noteId", noteId);
+                        command.Parameters.AddWithValue("@userId", userId);
+                        command.ExecuteNonQuery();
+                        return;
                     }
-                    command.CommandText = "update notes set title = @title, text = @text, changed_time = @changed_time where id=@id; ";
-                    command.Parameters.AddWithValue("@id", note.Id);
-                    command.Parameters.AddWithValue("@title", note.Title);
-                    command.Parameters.AddWithValue("@text", note.Text);
-                    command.Parameters.AddWithValue("@changed_time", note.Changed);
-                    command.ExecuteNonQuery();
-                    return note;
                 }
+            }
+            throw new ArgumentException($"Заметка с id {noteId} не существует или пользователь с id {userId} не существует");
+        }
+
+        public void DenyShared(Guid noteId, Guid userId)
+        {
+            ICategoriesRepository _categoriesRepository = new CategoriesRepository(_connectionString);
+            IUsersRepository _usersRepository = new UsersRepository(_connectionString);
+            if (IsExist(noteId) && _usersRepository.IsExist(userId))
+            {
+                using (var sqlConnection = new SqlConnection(_connectionString))
+                {
+                    sqlConnection.Open();
+                    using (var command = sqlConnection.CreateCommand())
+                    {
+                        command.CommandText = "delete from shared " +
+                            "where note_id = @noteId and user_id = @userId;";
+                        command.Parameters.AddWithValue("@noteId", noteId);
+                        command.Parameters.AddWithValue("@userId", userId);
+                        command.ExecuteNonQuery();
+                        return;
+                    }
+                }
+            }
+        }
+
+        public Note Update(Note note)
+        {
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            {
+                sqlConnection.Open();
+                if (IsExist(note.Id))
+                {
+                    using (var command = sqlConnection.CreateCommand())
+                    {
+                        note.Changed = DateTime.Now;
+                        command.CommandText = "update notes " +
+                            "set title = @title, text = @text, changed_time = @changed_time where id=@id; ";
+                        command.Parameters.AddWithValue("@id", note.Id);
+                        command.Parameters.AddWithValue("@title", note.Title);
+                        command.Parameters.AddWithValue("@text", note.Text??"");
+                        command.Parameters.AddWithValue("@changed_time", note.Changed);
+                        command.ExecuteNonQuery();
+                        return note;
+                    }
+                }
+                throw new ArgumentException($"Заметка с id {note.Id} не найдена.");
             }
         }
     }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ddevernote.Model
+namespace DDEvernote.Model
 {
     public class User
     {

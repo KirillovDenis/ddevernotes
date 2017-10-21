@@ -4,19 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
-using ddevernote.Model;
+using DDEvernote.Model;
 
-namespace ddevernote.DataLayer.Sql
+namespace DDEvernote.DataLayer.Sql
 {
     public class UsersRepository : IUsersRepository
     {
         private readonly string _connectionString;
-        private readonly ICategoriesRepository _categoriesRepository;
+        
 
-        public UsersRepository(String connectionString, ICategoriesRepository categoriesRepository)
+        public UsersRepository(String connectionString)
         {
             _connectionString = connectionString;
-            _categoriesRepository = categoriesRepository;
         }
 
         public User Create(User user)
@@ -27,17 +26,20 @@ namespace ddevernote.DataLayer.Sql
                 using (var command = sqlConnection.CreateCommand())
                 {
                     user.Id = Guid.NewGuid();
-                    command.CommandText = "insert into users (id, name, password) values (@id, @name, @password)";
+                    command.CommandText = "insert into users (id, name, password) " +
+                        "values (@id, @name, @password);";
                     command.Parameters.AddWithValue("@id", user.Id);
                     command.Parameters.AddWithValue("@name", user.Name);
                     command.Parameters.AddWithValue("@password", user.Password);
                     command.ExecuteNonQuery();
+                    user.Categories = new List<Category>();
                     return user;
                 }
             }
         }
+
         public void Delete(Guid userId)
-        {//TODO cascade
+        {
             using (var sqlConnection = new SqlConnection(_connectionString))
             {
                 sqlConnection.Open();
@@ -49,14 +51,16 @@ namespace ddevernote.DataLayer.Sql
                 }
             }
         }
+
         public User Get(Guid Id)
         {
+            ICategoriesRepository _categoriesRepository = new CategoriesRepository(_connectionString);
             using (var sqlConnection = new SqlConnection(_connectionString))
             {
                 sqlConnection.Open();
                 using (var command = sqlConnection.CreateCommand())
                 {
-                    command.CommandText = "select name, password from users where id = @id";
+                    command.CommandText = "select name, password  from users where id = @id;";
                     command.Parameters.AddWithValue("@id", Id);
                     using (var reader = command.ExecuteReader())
                     {
@@ -64,7 +68,7 @@ namespace ddevernote.DataLayer.Sql
                         {
                             throw new ArgumentException($"Пользователь с id {Id} не найден");
                         }
-                        var user = new User
+                        var user = new User()
                         {
                             Id = Id,
                             Name = reader.GetString(reader.GetOrdinal("name")),
@@ -76,50 +80,80 @@ namespace ddevernote.DataLayer.Sql
                 }
             }
         }
+
         public IEnumerable<User> GetUsersBySharedNote(Guid noteId)
         {
+            ICategoriesRepository _categoriesRepository = new CategoriesRepository(_connectionString);
             using (var sqlConnection = new SqlConnection(_connectionString))
             {
                 sqlConnection.Open();
                 using (var command = sqlConnection.CreateCommand())
                 {
-                    command.CommandText = "select users.id, users.name, users.password from users inner join shared on shared.user_id=users.id where shared.note_id = @noteId";
+                    command.CommandText = "select users.id, users.name, users.password " +
+                        "from users inner join shared " +
+                        "on shared.user_id=users.id " +
+                        "where shared.note_id = @noteId";
                     command.Parameters.AddWithValue("@noteId", noteId);
                     using (var reader = command.ExecuteReader())
                     {
-                        yield return new User
+                        var listOfUsers = new List<User>();
+                        while (reader.Read())
                         {
-                            Id = new Guid(reader.GetString(reader.GetOrdinal("users.id"))),
-                            Name = reader.GetString(reader.GetOrdinal("name")),
-                            Password = reader.GetString(reader.GetOrdinal("password")),
-                            Categories = _categoriesRepository.GetUserCategories(new Guid(reader.GetString(reader.GetOrdinal("users.id"))))
-                        };
+                            listOfUsers.Add(new User
+                            {
+                                Id = new Guid(reader.GetString(reader.GetOrdinal("id"))),
+                                Name = reader.GetString(reader.GetOrdinal("name")),
+                                Password = reader.GetString(reader.GetOrdinal("password")),
+                                Categories = _categoriesRepository.GetUserCategories(new Guid(reader.GetString(reader.GetOrdinal("id"))))
+                            });
+                        }
+                        return listOfUsers;
                     }
                 }
             }
         }
-        public User Update(User user)
+
+        public bool IsExist(Guid userId)
         {
             using (var sqlConnection = new SqlConnection(_connectionString))
             {
                 sqlConnection.Open();
-                try
-                {
-                    var existedUser = Get(user.Id);
-                }
-                catch (ArgumentException ex)
-                {
-                    throw ex;
-                }
                 using (var command = sqlConnection.CreateCommand())
                 {
-                    command.CommandText = "update users set name = @name, password = @password where id=@id";
-                    command.Parameters.AddWithValue("@name", user.Name);
-                    command.Parameters.AddWithValue("@password", user.Password);
-                    command.Parameters.AddWithValue("@id", user.Id);
-                    command.ExecuteNonQuery();
-                    return user;
+                    command.CommandText = "select name from users where id=@id";
+                    command.Parameters.AddWithValue("@id", userId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return true;
+                        }
+                        return false;
+                    }
                 }
+            }
+        }
+
+        public User Update(User user)
+        {
+            ICategoriesRepository _categoriesRepository = new CategoriesRepository(_connectionString);
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            {
+                sqlConnection.Open();
+                if (IsExist(user.Id))
+                {
+                    using (var command = sqlConnection.CreateCommand())
+                    {
+                        command.CommandText = "update users set name = @name, password = @password where id=@id";
+                        command.Parameters.AddWithValue("@name", user.Name);
+                        command.Parameters.AddWithValue("@password", user.Password);
+                        command.Parameters.AddWithValue("@id", user.Id);
+                        command.ExecuteNonQuery();
+                        user.Categories = _categoriesRepository.GetUserCategories(user.Id);
+                        return user;
+                    }
+                }
+                throw new ArgumentException($"Пользователя с id { user.Id } не существует");
             }
         }
     }

@@ -1,11 +1,11 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ddevernote.DataLayer.Sql;
+using DDEvernote.DataLayer.Sql;
 using System.Linq;
-using ddevernote.Model;
+using DDEvernote.Model;
 using System.Collections.Generic;
 
-namespace ddevernote.DataLayer.Sql.Tests
+namespace DDEvernote.DataLayer.Sql.Tests
 {
     [TestClass]
     public class UserRepositoryTests
@@ -25,21 +25,59 @@ namespace ddevernote.DataLayer.Sql.Tests
 
             //act
             var categoriesRepository = new CategoriesRepository(ConnectionString);
-            var userRepository = new UsersRepository(ConnectionString, categoriesRepository);
-            var result = userRepository.Create(user);
+            var userRepository = new UsersRepository(ConnectionString);
         
-            var userFromDb = userRepository.Get(result.Id);
-            _tempUsers.Add(userFromDb.Id);
-
+            user = userRepository.Create(user);
+            _tempUsers.Add(user.Id);
+            var createdUser = userRepository.Get(user.Id);
 
             //asserts
-            Assert.AreEqual(user.Name, userFromDb.Name);
-            Assert.AreEqual(user.Password, userFromDb.Password);
+            Assert.AreEqual(user.Name, createdUser.Name);
+            Assert.AreEqual(user.Password, createdUser.Password);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void ShouldCreateAndDeleteUser()
+        public void ShouldGetUsersByShraredNoteId()
+        {
+            //arrange
+            var user1 = new User
+            {
+                Name = "testName1",
+                Password = "123"
+            };
+            var user2 = new User
+            {
+                Name = "testName2",
+                Password = "123",
+                Categories = new List<Category>()
+            };
+            var note = new Note
+            {
+                Title = "test note",
+                Owner = user1,
+                Text = "some test text"
+            };
+
+            //act
+            var categoriesRepository = new CategoriesRepository(ConnectionString);
+            var usersRepository = new UsersRepository(ConnectionString);
+            var notesRepository = new NotesRepository(ConnectionString);
+
+            user1 = usersRepository.Create(user1);
+            user2 = usersRepository.Create(user2);
+            _tempUsers.Add(user1.Id);
+            _tempUsers.Add(user2.Id);
+            note = notesRepository.Create(note);
+            notesRepository.Share(note.Id, user2.Id);
+
+            var receivedUser = usersRepository.GetUsersBySharedNote(note.Id).Single();
+
+            //asserts
+            Assert.AreEqual(user2.Id, receivedUser.Id);
+        }
+
+        [TestMethod]
+        public void ShouldDeleteUser()
         {
             //arrange
             var user = new User
@@ -47,24 +85,22 @@ namespace ddevernote.DataLayer.Sql.Tests
                 Name = "test",
                 Password = "password"
             };
-            const string category = "testCategory";
 
             //act
             var categoriesRepository = new CategoriesRepository(ConnectionString);
-            var usersRepository = new UsersRepository(ConnectionString, categoriesRepository);
+            var usersRepository = new UsersRepository(ConnectionString);
+
             user = usersRepository.Create(user);
-
             _tempUsers.Add(user.Id);
-            var userDB = usersRepository.Get(user.Id);
-            usersRepository.Delete(userDB.Id);
-
+            var createdUser = usersRepository.Get(user.Id);
+            usersRepository.Delete(createdUser.Id);
 
             //asserts
-           var deltedUser = usersRepository.Get(userDB.Id);
+            Assert.IsFalse(usersRepository.IsExist(createdUser.Id));
         }
 
         [TestMethod]
-        public void ShouldCreateAndUpdateUser()
+        public void ShouldUpdateUser()
         {
             //arrange
             var user = new User
@@ -77,11 +113,10 @@ namespace ddevernote.DataLayer.Sql.Tests
 
             //act
             var categoryRepo = new CategoriesRepository(ConnectionString);
-            var userRepo = new UsersRepository(ConnectionString, categoryRepo);
+            var userRepo = new UsersRepository(ConnectionString);
 
-            user = userRepo.Create(user);
+            userRepo.Create(user);
             _tempUsers.Add(user.Id);
-
             user.Name = updatedName;
             user.Password = updatedPassword;
             userRepo.Update(user);
@@ -96,7 +131,9 @@ namespace ddevernote.DataLayer.Sql.Tests
         public void CleanData()
         {
             foreach (var id in _tempUsers)
-                new UsersRepository(ConnectionString, new CategoriesRepository(ConnectionString)).Delete(id);
+            {
+                new UsersRepository(ConnectionString).Delete(id);
+            }
             _tempUsers.Clear();
         }
     }

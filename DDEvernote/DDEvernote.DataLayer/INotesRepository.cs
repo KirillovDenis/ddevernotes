@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ddevernote.Model;
+using DDEvernote.Model;
 
-namespace ddevernote.DataLayer
+namespace DDEvernote.DataLayer
 {
     public interface INotesRepository
     {
@@ -13,8 +13,11 @@ namespace ddevernote.DataLayer
         Note Get(Guid noteId);
         Note Update(Note note);
         void Delete(Guid noteId);
-        Note AddNote(Guid categoryId, Guid noteId);
+        void Share(Guid noteId, Guid userId);
+        void DenyShared(Guid noteId, Guid userId);
+        bool IsExist(Guid noteId);
+        void AddNoteInCategory(Guid categoryId, Guid noteId);
         IEnumerable<Note> GetUserNotes(Guid userId);
-        IEnumerable<Note> GetUserNotesByCategory(Guid userId, string categoryName);
+        IEnumerable<Note> GetNotesByCategory(Guid categoryId);
     }
 }

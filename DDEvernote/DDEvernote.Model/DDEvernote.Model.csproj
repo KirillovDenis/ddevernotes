@@ -7,8 +7,8 @@
     <ProjectGuid>{0D967179-20FC-410D-BD51-6EDEF1384E00}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ddevernote.Model</RootNamespace>
-    <AssemblyName>ddevernote.Model</AssemblyName>
+    <RootNamespace>DDEvernote.Model</RootNamespace>
+    <AssemblyName>DDEvernote.Model</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -7,8 +7,8 @@
     <ProjectGuid>{F94C2FD6-70CF-40F1-B9DC-99667B75F713}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ddevernote.DataLayer.Sql.Tests</RootNamespace>
-    <AssemblyName>ddevernote.DataLayer.Sql.Tests</AssemblyName>
+    <RootNamespace>DDEvernote.DataLayer.Sql.Tests</RootNamespace>
+    <AssemblyName>DDEvernote.DataLayer.Sql.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -50,26 +50,26 @@
   <ItemGroup>
     <Compile Include="CategoriesRepositoryTests.cs" />
     <Compile Include="NotesRepositoryTests.cs" />
-    <Compile Include="Repos.cs" />
     <Compile Include="UsersRepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\DDEvernote.DataLayer.Sql\DDEvernote.DataLayer.Sql.csproj">
+      <Project>{b1198818-a821-4d75-806f-de7e03cc5680}</Project>
+      <Name>DDEvernote.DataLayer.Sql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DDEvernote.DataLayer\DDEvernote.DataLayer.csproj">
+      <Project>{8aee7647-8724-4abf-82d2-88d9fce14f8d}</Project>
+      <Name>DDEvernote.DataLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DDEvernote.Model\DDEvernote.Model.csproj">
+      <Project>{0d967179-20fc-410d-bd51-6edef1384e00}</Project>
+      <Name>DDEvernote.Model</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DataLayer\ddevernote.DataLayer.csproj">
-      <Project>{8aee7647-8724-4abf-82d2-88d9fce14f8d}</Project>
-      <Name>ddevernote.DataLayer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ddevernote.DataLayer.Sql\ddevernote.DataLayer.Sql.csproj">
-      <Project>{b1198818-a821-4d75-806f-de7e03cc5680}</Project>
-      <Name>ddevernote.DataLayer.Sql</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Model\ddevernote.Model.csproj">
-      <Project>{0d967179-20fc-410d-bd51-6edef1384e00}</Project>
-      <Name>ddevernote.Model</Name>
-    </ProjectReference>
+    <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
-using ddevernote.Model;
+using DDEvernote.Model;
 
-namespace ddevernote.DataLayer.Sql
+namespace DDEvernote.DataLayer.Sql
 {
     public class CategoriesRepository : ICategoriesRepository
     {
         private readonly string _connectionString;
-        private readonly INotesRepository _notesRepository;
         public CategoriesRepository(string connectionString)
         {
             _connectionString = connectionString;
@@ -36,6 +35,7 @@ namespace ddevernote.DataLayer.Sql
                 };
             }
         }
+
         public Category Create(Guid userId, string categoryTitle)
         {
             using (var sqlConnection = new SqlConnection(_connectionString))
@@ -57,6 +57,7 @@ namespace ddevernote.DataLayer.Sql
                 }
             }
         }
+
         public void Delete(Guid categoryId)
         {
             using (var sqlConnection = new SqlConnection(_connectionString))
@@ -70,6 +71,7 @@ namespace ddevernote.DataLayer.Sql
                 }
             }
         }
+
         public IEnumerable<Category> GetUserCategories(Guid userId)
         {
             using (var sqlConnection = new SqlConnection(_connectionString))
@@ -81,18 +83,21 @@ namespace ddevernote.DataLayer.Sql
                     command.Parameters.AddWithValue("@userId", userId);
                     using (var reader = command.ExecuteReader())
                     {
-                        while(reader.Read())
+                        var listOfCategory = new List<Category>();
+                        while (reader.Read())
                         {
-                            yield return new Category
+                            listOfCategory.Add(new Category
                             {
                                 Title = reader.GetString(reader.GetOrdinal("title")),
                                 Id = new Guid(reader.GetString(reader.GetOrdinal("id")))
-                            };
+                            });
                         }
+                        return listOfCategory;
                     }
                 }
             }
         }
+
         public Category Get(Guid categoryId)
         {
             using (var sqlConnection = new SqlConnection(_connectionString))
@@ -108,7 +113,6 @@ namespace ddevernote.DataLayer.Sql
                         {
                             throw new ArgumentException($"Категория с id {categoryId} не найдена");
                         }
-
                         return new Category
                         {
                             Id = categoryId,
@@ -118,6 +122,55 @@ namespace ddevernote.DataLayer.Sql
                 }
             }
         }
-       
+
+        public bool IsExist(Guid categoryId)
+        {
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            {
+                sqlConnection.Open();
+                using (var command = sqlConnection.CreateCommand())
+                {
+                    command.CommandText = "select title from category where id=@id";
+                    command.Parameters.AddWithValue("@id", categoryId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<Category> GetCategoriesOfNote(Guid noteId)
+        {
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            {
+                sqlConnection.Open();
+                using (var command = sqlConnection.CreateCommand())
+                {
+                    command.CommandText = "select category.id, category.title " +
+                        "from category_notes inner join category " +
+                        "on category_notes.category_id = category.id " +
+                        "where category_notes.note_id = @noteId;";
+                    command.Parameters.AddWithValue("@noteId", noteId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        List<Category> listOfCategory = new List<Category>();
+                        while (reader.Read())
+                        {
+                            listOfCategory.Add(new Category
+                            {
+                                Id = new Guid(reader.GetString(reader.GetOrdinal("id"))),
+                                Title = reader.GetString(reader.GetOrdinal("title"))
+                            });
+                        }
+                        return listOfCategory;
+                    }
+                }
+            }
+        }
     }
 }

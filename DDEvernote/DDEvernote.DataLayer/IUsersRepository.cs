@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ddevernote.Model;
+using DDEvernote.Model;
 
-namespace ddevernote.DataLayer
+namespace DDEvernote.DataLayer
 {
     public interface IUsersRepository
     {
         User Create(User user);
+        bool IsExist(Guid userId);
         void Delete(Guid userId);
         User Update(User user);
         User Get(Guid Id);

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DDEvernote.DataLayer.Sql")]
+[assembly: AssemblyTitle("DDEvernote.DataLayer")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DDEvernote.DataLayer.Sql")]
+[assembly: AssemblyProduct("DDEvernote.DataLayer")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("b1198818-a821-4d75-806f-de7e03cc5680")]
+[assembly: Guid("8aee7647-8724-4abf-82d2-88d9fce14f8d")]
 
 // Version information for an assembly consists of the following four values:
 //
