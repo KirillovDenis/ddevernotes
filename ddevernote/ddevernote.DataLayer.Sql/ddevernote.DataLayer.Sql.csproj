@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B1198818-A821-4D75-806F-DE7E03CC5680}</ProjectGuid>
+    <ProjectGuid>{2BA1E81A-A396-4306-A11E-56D19B34D8FB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DDEvernote.DataLayer.Sql</RootNamespace>
@@ -32,7 +32,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,8 +42,8 @@
   <ItemGroup>
     <Compile Include="CategoriesRepository.cs" />
     <Compile Include="NotesRepository.cs" />
-    <Compile Include="UsersRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UsersRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DDEvernote.DataLayer\DDEvernote.DataLayer.csproj">

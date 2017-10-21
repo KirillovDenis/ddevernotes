@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F94C2FD6-70CF-40F1-B9DC-99667B75F713}</ProjectGuid>
+    <ProjectGuid>{22A4DDCA-1A36-4565-8464-AD8BD7AD58E1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DDEvernote.DataLayer.Sql.Tests</RootNamespace>
@@ -50,12 +50,15 @@
   <ItemGroup>
     <Compile Include="CategoriesRepositoryTests.cs" />
     <Compile Include="NotesRepositoryTests.cs" />
-    <Compile Include="UsersRepositoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UsersRepositoryTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DDEvernote.DataLayer.Sql\DDEvernote.DataLayer.Sql.csproj">
-      <Project>{b1198818-a821-4d75-806f-de7e03cc5680}</Project>
+      <Project>{2ba1e81a-a396-4306-a11e-56d19b34d8fb}</Project>
       <Name>DDEvernote.DataLayer.Sql</Name>
     </ProjectReference>
     <ProjectReference Include="..\DDEvernote.DataLayer\DDEvernote.DataLayer.csproj">
@@ -66,10 +69,6 @@
       <Project>{0d967179-20fc-410d-bd51-6edef1384e00}</Project>
       <Name>DDEvernote.Model</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

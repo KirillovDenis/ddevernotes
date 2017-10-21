@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ddevernote.DataLayer.Sql", "ddevernote.DataLayer.Sql\ddevernote.DataLayer.Sql.csproj", "{B1198818-A821-4D75-806F-DE7E03CC5680}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ddevernote.DataLayer.Sql.Tests", "ddevernote.DataLayer.Sql.Tests\ddevernote.DataLayer.Sql.Tests.csproj", "{F94C2FD6-70CF-40F1-B9DC-99667B75F713}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDEvernote.DataLayer", "DDEvernote.DataLayer\DDEvernote.DataLayer.csproj", "{8AEE7647-8724-4ABF-82D2-88D9FCE14F8D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDEvernote.Model", "DDEvernote.Model\DDEvernote.Model.csproj", "{0D967179-20FC-410D-BD51-6EDEF1384E00}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDEvernote.Api", "DDEvernote.Api\DDEvernote.Api.csproj", "{89213658-0939-4E8F-A77C-8DB52FC4A411}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDEvernote.DataLayer.Sql", "DDEvernote.DataLayer.Sql\DDEvernote.DataLayer.Sql.csproj", "{2BA1E81A-A396-4306-A11E-56D19B34D8FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDEvernote.DataLayer.Sql.Tests", "DDEvernote.DataLayer.Sql.Tests\DDEvernote.DataLayer.Sql.Tests.csproj", "{22A4DDCA-1A36-4565-8464-AD8BD7AD58E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B1198818-A821-4D75-806F-DE7E03CC5680}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B1198818-A821-4D75-806F-DE7E03CC5680}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B1198818-A821-4D75-806F-DE7E03CC5680}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B1198818-A821-4D75-806F-DE7E03CC5680}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F94C2FD6-70CF-40F1-B9DC-99667B75F713}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F94C2FD6-70CF-40F1-B9DC-99667B75F713}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F94C2FD6-70CF-40F1-B9DC-99667B75F713}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F94C2FD6-70CF-40F1-B9DC-99667B75F713}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8AEE7647-8724-4ABF-82D2-88D9FCE14F8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8AEE7647-8724-4ABF-82D2-88D9FCE14F8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8AEE7647-8724-4ABF-82D2-88D9FCE14F8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -39,6 +31,14 @@ Global
 		{89213658-0939-4E8F-A77C-8DB52FC4A411}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89213658-0939-4E8F-A77C-8DB52FC4A411}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89213658-0939-4E8F-A77C-8DB52FC4A411}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BA1E81A-A396-4306-A11E-56D19B34D8FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BA1E81A-A396-4306-A11E-56D19B34D8FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BA1E81A-A396-4306-A11E-56D19B34D8FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BA1E81A-A396-4306-A11E-56D19B34D8FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22A4DDCA-1A36-4565-8464-AD8BD7AD58E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22A4DDCA-1A36-4565-8464-AD8BD7AD58E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22A4DDCA-1A36-4565-8464-AD8BD7AD58E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22A4DDCA-1A36-4565-8464-AD8BD7AD58E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

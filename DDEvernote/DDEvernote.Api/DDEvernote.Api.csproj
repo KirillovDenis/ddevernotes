@@ -119,9 +119,9 @@
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ddevernote.DataLayer.Sql\ddevernote.DataLayer.Sql.csproj">
-      <Project>{b1198818-a821-4d75-806f-de7e03cc5680}</Project>
-      <Name>ddevernote.DataLayer.Sql</Name>
+    <ProjectReference Include="..\DDEvernote.DataLayer.Sql\DDEvernote.DataLayer.Sql.csproj">
+      <Project>{2ba1e81a-a396-4306-a11e-56d19b34d8fb}</Project>
+      <Name>DDEvernote.DataLayer.Sql</Name>
     </ProjectReference>
     <ProjectReference Include="..\DDEvernote.DataLayer\DDEvernote.DataLayer.csproj">
       <Project>{8aee7647-8724-4abf-82d2-88d9fce14f8d}</Project>
