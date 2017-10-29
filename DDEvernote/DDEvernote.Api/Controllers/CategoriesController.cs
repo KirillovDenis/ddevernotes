@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using DDEvernote.Model;
 using DDEvernote.DataLayer;
 using DDEvernote.DataLayer.Sql;
+using DDEvernote.Api.Filters;
 
 namespace DDEvernote.Api.Controllers
 {
@@ -17,6 +15,7 @@ namespace DDEvernote.Api.Controllers
     {
         private const string _connectionString = @"Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;";
         private readonly ICategoriesRepository _categoriesRepository;
+        private readonly NLog.Logger _logger;
         
         /// <summary>
         /// Создание репозитория для управления категориями
@@ -24,31 +23,36 @@ namespace DDEvernote.Api.Controllers
         public CategoriesController()
         {
             _categoriesRepository = new CategoriesRepository(_connectionString);
+            _logger = Logger.Log.Instance;
         }
 
         /// <summary>
         /// Создание категории у пользователя
         /// </summary>
-        /// <param name="user_id">Идентификатор пользователя, которому будет принадлежать категория</param>
+        /// <param name="userId">Идентификатор пользователя, которому будет принадлежать категория</param>
         /// <param name="category">Название категории</param>
         /// <returns>Созданная категория</returns>
         [HttpPost]
-        [Route("api/user/{user_id}/category")]
-        public Category Post(Guid user_id, [FromBody] Category category)
+        [Route("api/users/{userId}/categories")]
+        [UsersExceptionFilter]
+        public Category Post(Guid userId, [FromBody] Category category)
         {
-            return _categoriesRepository.Create(user_id, category.Title);
+            _logger.Info("Запрос на создание категории: \"{0}\" для пользователя с id: \"{1}\"", category.Title, userId);
+            return _categoriesRepository.Create(userId, category.Title);
         }
 
         /// <summary>
         /// Получает категорию по идентификатору
         /// </summary>
-        /// <param name="category_id">Идентификатор</param>
+        /// <param name="categoryId">Идентификатор</param>
         /// <returns>Существующая категория</returns>
         [HttpGet]
-        [Route("api/category/{category_id}")]
-        public Category Get(Guid category_id)
+        [Route("api/categories/{categoryId}")]
+        [CategoriesExceptionFilter]
+        public Category Get(Guid categoryId)
         {
-            return _categoriesRepository.Get(category_id);
+            _logger.Info("Зарос на получение категории с id: \"{0}\"", categoryId);
+            return _categoriesRepository.Get(categoryId);
         }
 
         /// <summary>
@@ -57,33 +61,38 @@ namespace DDEvernote.Api.Controllers
         /// <param name="category">Категория</param>
         /// <returns>Обновленная категория</returns>
         [HttpPut]
-        [Route("api/category")]
+        [Route("api/categories")]
+        [CategoriesExceptionFilter]
         public Category Put([FromBody] Category category)
         {
-            return _categoriesRepository.UpdateTitle(category.Id, category.Title);
+            _logger.Info("Запрос на обновление категории с id: \"{0}\"", category.Id);
+            return _categoriesRepository.Update(category);
         }
 
         /// <summary>
         /// Получение всех категорий пользователя
         /// </summary>
-        /// <param name="user_id">Идентификтор пользователя</param>
+        /// <param name="userId">Идентификтор пользователя</param>
         /// <returns>Список категорий</returns>
         [HttpGet]
-        [Route("api/user/{user_id}/categories")]
-        public IEnumerable<Category> GetCateories(Guid user_id)
+        [Route("api/users/{userId}/categories")]
+        [UsersExceptionFilter]
+        public IEnumerable<Category> GetCategories(Guid userId)
         {
-            return _categoriesRepository.GetUserCategories(user_id);
+            _logger.Info("Запрос на получение категорий пользователся с id: \"{0}\"", userId);
+            return _categoriesRepository.GetUserCategories(userId);
         }
 
         /// <summary>
         /// Удаление категории
         /// </summary>
-        /// <param name="category_id">Идентификатор категории</param>
+        /// <param name="categoryId">Идентификатор категории</param>
         [HttpDelete]
-        [Route("api/category/{category_id}")]
-        public void Delete(Guid category_id)
+        [Route("api/categories/{categoryId}")]
+        public void Delete(Guid categoryId)
         {
-            _categoriesRepository.Delete(category_id);
+            _logger.Info("Запрос на удаление категории с id: \"{0}\"", categoryId);
+            _categoriesRepository.Delete(categoryId);
         }
     }
 }

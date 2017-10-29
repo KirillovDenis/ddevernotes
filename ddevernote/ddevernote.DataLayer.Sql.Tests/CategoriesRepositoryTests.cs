@@ -83,7 +83,8 @@ namespace DDEvernote.DataLayer.Sql.Tests
             _tempUsers.Add(user.Id);
 
             Category createdCategory = categoriesRepository.Create(user.Id, categoryTitle);
-            var updatedCategory = categoriesRepository.UpdateTitle(createdCategory.Id, updatedCategoryTitle);
+            createdCategory.Title = updatedCategoryTitle;
+            var updatedCategory = categoriesRepository.Update(createdCategory);
             var usersCategory = categoriesRepository.GetUserCategories(user.Id);
 
             //assert 

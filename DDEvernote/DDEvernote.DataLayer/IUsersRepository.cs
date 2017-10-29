@@ -10,10 +10,10 @@ namespace DDEvernote.DataLayer
     public interface IUsersRepository
     {
         User Create(User user);
-        bool IsExist(Guid userId);
-        void Delete(Guid userId);
-        User Update(User user);
         User Get(Guid Id);
+        User Update(User user);
+        void Delete(Guid userId);
         IEnumerable<User> GetUsersBySharedNote(Guid noteId);
+        bool IsExist(Guid userId);
     }
 }

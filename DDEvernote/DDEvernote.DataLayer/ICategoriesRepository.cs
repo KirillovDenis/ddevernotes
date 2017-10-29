@@ -10,11 +10,11 @@ namespace DDEvernote.DataLayer
     public interface ICategoriesRepository
     {
         Category Create(Guid userId, string categoryTitle);
-        bool IsExist(Guid categoryId);
         Category Get(Guid categoryId);
-        Category UpdateTitle(Guid categoryId, string newTitle);
+        Category Update(Category category);
         void Delete(Guid categoryId);
         IEnumerable<Category> GetUserCategories(Guid userId);
         IEnumerable<Category> GetCategoriesOfNote(Guid noteId);
+        bool IsExist(Guid categoryId);
     }
 }

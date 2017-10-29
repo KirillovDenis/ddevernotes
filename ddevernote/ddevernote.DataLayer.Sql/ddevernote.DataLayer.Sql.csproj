@@ -30,8 +30,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.5.0.0-beta11\lib\net45\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,10 +58,17 @@
       <Project>{8aee7647-8724-4abf-82d2-88d9fce14f8d}</Project>
       <Name>DDEvernote.DataLayer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DDEvernote.Logger\DDEvernote.Logger.csproj">
+      <Project>{7b963ac8-507b-4e6d-8d5a-88353cf1314a}</Project>
+      <Name>DDEvernote.Logger</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DDEvernote.Model\DDEvernote.Model.csproj">
       <Project>{0d967179-20fc-410d-bd51-6edef1384e00}</Project>
       <Name>DDEvernote.Model</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

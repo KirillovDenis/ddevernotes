@@ -12,12 +12,12 @@ namespace DDEvernote.DataLayer
         Note Create(Note note);
         Note Get(Guid noteId);
         Note Update(Note note);
-        void Delete(Guid noteId);
+        void AddNoteInCategory(Guid categoryId, Guid noteId);
         void Share(Guid noteId, Guid userId);
         void DenyShared(Guid noteId, Guid userId);
-        bool IsExist(Guid noteId);
-        void AddNoteInCategory(Guid categoryId, Guid noteId);
+        void Delete(Guid noteId);
         IEnumerable<Note> GetUserNotes(Guid userId);
         IEnumerable<Note> GetNotesByCategory(Guid categoryId);
+        bool IsExist(Guid noteId);
     }
 }

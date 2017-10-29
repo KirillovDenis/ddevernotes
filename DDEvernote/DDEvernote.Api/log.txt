@@ -1,0 +1,56 @@
+2017-10-26 22:55:54.8308|INFO|DDEvernote.Logger.Log|Запрос на создание пользователя с именем: test name
+2017-10-26 22:55:56.2873|INFO|DDEvernote.Logger.Log|Создан пользователь с id: 5a536c09-aa0b-4461-b7e4-66df0e0eb25e, name: test name (имеет категорий: 0)
+2017-10-26 23:01:28.1650|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления пользователями с помощью Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;
+2017-10-26 23:01:28.1650|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления пользователями с помощью Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;
+2017-10-26 23:01:38.2110|INFO|DDEvernote.Logger.Log|Зарос на получение пользователя с id: ec50815d-feeb-4084-adc4-b2197cbf1e2e
+2017-10-26 23:01:38.2110|INFO|DDEvernote.Logger.Log|Зарос на получение пользователя с id: ec50815d-feeb-4084-adc4-b2197cbf1e2e
+2017-10-26 23:01:38.2820|DEBUG|DDEvernote.Logger.Log|Начато получение пользователя с id: ec50815d-feeb-4084-adc4-b2197cbf1e2e
+2017-10-26 23:01:38.2820|DEBUG|DDEvernote.Logger.Log|Начато получение пользователя с id: ec50815d-feeb-4084-adc4-b2197cbf1e2e
+2017-10-26 23:01:38.4580|DEBUG|DDEvernote.Logger.Log|Запрос к базе данных на получение пользователся с id: ec50815d-feeb-4084-adc4-b2197cbf1e2e
+2017-10-26 23:01:38.5330|DEBUG|DDEvernote.Logger.Log|Запрос к базе данных на получение пользователся с id: ec50815d-feeb-4084-adc4-b2197cbf1e2e
+2017-10-26 23:01:39.0620|DEBUG|DDEvernote.Logger.Log|Получение категорий пользователя с id: ec50815d-feeb-4084-adc4-b2197cbf1e2e
+2017-10-26 23:01:39.0620|DEBUG|DDEvernote.Logger.Log|Получение категорий пользователя с id: ec50815d-feeb-4084-adc4-b2197cbf1e2e
+2017-10-26 23:01:39.2071|INFO|DDEvernote.Logger.Log|Получен пользователь с id: ec50815d-feeb-4084-adc4-b2197cbf1e2e, name: peter (имеет категорий: 0)
+2017-10-26 23:01:39.2071|INFO|DDEvernote.Logger.Log|Получен пользователь с id: ec50815d-feeb-4084-adc4-b2197cbf1e2e, name: peter (имеет категорий: 0)
+2017-10-26 23:02:45.2864|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления пользователями с помощью Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;
+2017-10-26 23:03:03.0889|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления пользователями с помощью Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;
+2017-10-26 23:03:31.3670|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления пользователями с помощью Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;
+2017-10-26 23:03:33.7314|INFO|DDEvernote.Logger.Log|Зарос на получение пользователя с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-26 23:03:33.7514|DEBUG|DDEvernote.Logger.Log|Начато получение пользователя с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-26 23:03:33.7704|DEBUG|DDEvernote.Logger.Log|Запрос к базе данных на получение пользователся с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-26 23:03:34.1884|ERROR|DDEvernote.Logger.Log|При получении пользователя с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582 произошла ошибка: ХПользователь с id 81ac63f2-f81e-43c7-a8be-d565f7e45582 не существует
+2017-10-26 23:09:29.9439|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления пользователями с помощью Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;
+2017-10-26 23:10:04.5370|INFO|DDEvernote.Logger.Log|Запрос на создание пользователя с именем: test name2
+2017-10-26 23:10:21.0279|DEBUG|DDEvernote.Logger.Log|Начато создание пользователя с именем 
+2017-10-26 23:10:21.3149|DEBUG|DDEvernote.Logger.Log|Запрос к базе данных на создание пользователя с id: 6174d70e-b454-4c43-8cee-3373ded0f3ff, name: test name2
+2017-10-26 23:10:22.1790|INFO|DDEvernote.Logger.Log|Создан пользователь с id: 6174d70e-b454-4c43-8cee-3373ded0f3ff, name: test name2 (имеет категорий: 0)
+2017-10-26 23:24:53.7448|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления пользователями с помощью Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;
+2017-10-26 23:25:05.7093|INFO|DDEvernote.Logger.Log|Зарос на получение пользователя с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-26 23:25:05.8009|DEBUG|DDEvernote.Logger.Log|Начато получение пользователя с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-26 23:25:06.3939|DEBUG|DDEvernote.Logger.Log|Запрос к базе данных на получение пользователся с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-26 23:28:19.5616|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления пользователями с помощью Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;
+2017-10-26 23:28:23.4918|INFO|DDEvernote.Logger.Log|Зарос на получение пользователя с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-26 23:28:23.5218|DEBUG|DDEvernote.Logger.Log|Начато получение пользователя с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-26 23:28:23.7378|DEBUG|DDEvernote.Logger.Log|Запрос к базе данных на получение пользователся с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-26 23:32:42.1619|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления пользователями с помощью Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;
+2017-10-26 23:33:01.5539|INFO|DDEvernote.Logger.Log|Зарос на получение пользователя с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-26 23:33:01.5949|DEBUG|DDEvernote.Logger.Log|Начато получение пользователя с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-26 23:33:02.0339|DEBUG|DDEvernote.Logger.Log|Запрос к базе данных на получение пользователся с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-26 23:33:04.6136|ERROR|DDEvernote.Logger.Log|При получении пользователя с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582 произошла ошибка: ХПользователь с id 81ac63f2-f81e-43c7-a8be-d565f7e45582 не существует
+2017-10-26 23:46:01.5908|INFO|DDEvernote.Logger.Log|Зарос на получение категории с id: 0b7150f4-4f06-4599-896c-917ff1226074
+2017-10-29 13:55:54.8616|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления категориями с помощью: "Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;"
+2017-10-29 13:55:56.3402|INFO|DDEvernote.Logger.Log|Запрос на создание категории: name category (test api) у пользователя с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-29 13:55:56.4019|DEBUG|DDEvernote.Logger.Log|Начато создание категории с названием: "name category (test api)"
+2017-10-29 13:55:56.4160|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления пользователями с помощью: "Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;"
+2017-10-29 15:09:03.2402|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления категориями с помощью: "Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;"
+2017-10-29 15:09:03.7608|INFO|DDEvernote.Logger.Log|Запрос на создание категории: name category (test api) для пользователя с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-29 15:09:03.7838|DEBUG|DDEvernote.Logger.Log|Начато создание категории с названием: "name category (test api)" для пользователя с id: "81ac63f2-f81e-43c7-a8be-d565f7e45582"
+2017-10-29 15:09:03.8023|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления пользователями с помощью: "Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;"
+2017-10-29 15:09:03.8192|INFO|DDEvernote.Logger.Log|Провека существования пользователя с id: "81ac63f2-f81e-43c7-a8be-d565f7e45582"
+2017-10-29 15:09:04.4238|INFO|DDEvernote.Logger.Log|Пользоветель с id: "81ac63f2-f81e-43c7-a8be-d565f7e45582" не найден
+2017-10-29 15:09:04.4672|ERROR|DDEvernote.Logger.Log|Категория с названием: "name category (test api)" не будет создана для пользователя с id: "81ac63f2-f81e-43c7-a8be-d565f7e45582", так как такого пользователя не существует
+2017-10-29 15:10:04.8936|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления категориями с помощью: "Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;"
+2017-10-29 15:10:05.4560|INFO|DDEvernote.Logger.Log|Запрос на создание категории: name category (test api) для пользователя с id: 81ac63f2-f81e-43c7-a8be-d565f7e45582
+2017-10-29 15:10:05.4750|DEBUG|DDEvernote.Logger.Log|Начато создание категории с названием: "name category (test api)" для пользователя с id: "81ac63f2-f81e-43c7-a8be-d565f7e45582"
+2017-10-29 15:10:05.4970|DEBUG|DDEvernote.Logger.Log|Создание репозитория управления пользователями с помощью: "Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;"
+2017-10-29 15:10:05.5644|DEBUG|DDEvernote.Logger.Log|Запрос к базе данных на создание заметки с названием: "name category (test api)" для пользователя с id: "name category (test api)"
