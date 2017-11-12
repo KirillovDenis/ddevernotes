@@ -31,12 +31,15 @@ namespace DDEvernote.WPF.Views.Windows
 
         private void createCategoryBtn_Click(object sender, RoutedEventArgs e)
         {
-            if(_user.Categories.Where(c=>c.Title== categoryName.Text).Count()==0)
+            if (_user.Categories.Where(c => c.Title == categoryName.Text).Count() == 0 && categoryName.Text != string.Empty)
             {
                 var createdCategory = _client.CreateCategory(_user.Id, categoryName.Text);
                 this.Close();
             }
-            MessageBox.Show("Такая категория уже существует", "Ошибка создания категории", MessageBoxButton.OK, MessageBoxImage.Error);
+            else
+            {
+                MessageBox.Show("Такая категория уже существует", "Ошибка создания категории", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

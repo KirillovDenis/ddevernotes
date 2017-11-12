@@ -132,6 +132,8 @@ namespace DDEvernote.WPF.ViewModels
             UserNotes = new ObservableCollection<Note>(getNotes(user.Id));
             UserCategories = new ObservableCollection<Category>(user.Categories);
             Users = new ObservableCollection<User>(GetUsers().Where(u => u.Id != _user.Id));
+            NotesOfSelectedCategory = new ObservableCollection<Note>();
+            NotesOfSelectedUser = new ObservableCollection<Note>();
             IsEnableMainWindow = true;
             VisibilityPropertyOfNote = Visibility.Hidden;
         }
@@ -145,6 +147,8 @@ namespace DDEvernote.WPF.ViewModels
         {
             _client.DeleteNote(noteId);
             UserNotes.Remove(UserNotes.Where(n => n.Id == noteId).Single());
+            NotesOfSelectedCategory.Remove(NotesOfSelectedCategory.Where(n => n.Id == noteId).Single());
+            NotesOfSelectedUser.Remove(NotesOfSelectedUser.Where(n => n.Id == noteId).Single());
         }
         public void LoadNotes(object sender, EventArgs arg)
         {
@@ -241,13 +245,13 @@ namespace DDEvernote.WPF.ViewModels
         public void SelectUser(User user)
         {
             _selectedUser = user;
-            NotesOfSelectedUser = new ObservableCollection<Note>(GetNotesBySharedUser(user.Id));
+            NotesOfSelectedUser = new ObservableCollection<Note>(GetSharedNotesByTwoUser(user.Id));
         }
 
         public void SelectNote(Note note)
         {
             SelectedNote = note;
-            CategoriesOfSelectedNote = new ObservableCollection<Category>(GetCategoriesByNote(note.Id));
+            SelectedNote.Categories = new ObservableCollection<Category>(GetCategoriesByNote(note.Id));
             if (VisibilityPropertyOfNote == Visibility.Hidden)
             {
                 VisibilityPropertyOfNote = Visibility.Visible;
@@ -302,7 +306,7 @@ namespace DDEvernote.WPF.ViewModels
             var users = GetUsers();
             var selectedUsers = GetUsersBySharedNote(note.Id);
             var ansList = new List<GeneralType>();
-            foreach (var user in users.Where(u => u.Id != _user.Id && u.Id!=note.Owner.Id))
+            foreach (var user in users.Where(u => u.Id != _user.Id && u.Id != note.Owner.Id))
             {
                 if (selectedUsers.Where(u => u.Id == user.Id).Count() == 1)
                 {
@@ -317,19 +321,23 @@ namespace DDEvernote.WPF.ViewModels
             pickWindow.Closed += (object o, EventArgs arg) =>
             {
                 var tmpShare = new List<Guid>();
-                foreach (var user in pickWindow.SelectedItems)
-                {
-                    if (selectedUsers.Where(u => u.Id == user.Id).Count() == 0)
-                    {
-                        tmpShare.Add(user.Id);
-                    }
-                }
                 var tmpDenyShare = new List<Guid>();
-                foreach (var user in selectedUsers)
+                if (pickWindow.SelectedItems != null)
                 {
-                    if (pickWindow.SelectedItems.Where(u => u.Id == user.Id).Count() == 0)
+                    foreach (var user in pickWindow.SelectedItems)
                     {
-                        tmpDenyShare.Add(user.Id);
+                        if (selectedUsers.Where(u => u.Id == user.Id).Count() == 0)
+                        {
+                            tmpShare.Add(user.Id);
+                        }
+                    }
+
+                    foreach (var user in selectedUsers)
+                    {
+                        if (pickWindow.SelectedItems.Where(u => u.Id == user.Id).Count() == 0)
+                        {
+                            tmpDenyShare.Add(user.Id);
+                        }
                     }
                 }
                 ShareNote(tmpShare, note.Id);
@@ -342,6 +350,7 @@ namespace DDEvernote.WPF.ViewModels
                         break;
                     }
                 }
+                SelectedNote = _client.GetNote(SelectedNote.Id);
             };
             pickWindow.ShowDialog();
         }
@@ -365,19 +374,23 @@ namespace DDEvernote.WPF.ViewModels
             pickWindow.Closed += (object o, EventArgs arg) =>
             {
                 var tmpAddCatgory = new List<Guid>();
-                foreach (var category in pickWindow.SelectedItems)
-                {
-                    if (selectedCategories.Where(c => c.Id == category.Id).Count() == 0)
-                    {
-                        tmpAddCatgory.Add(category.Id);
-                    }
-                }
                 var tmpDeleteCategory = new List<Guid>();
-                foreach (var category in selectedCategories)
+                if (pickWindow.SelectedItems != null)
                 {
-                    if (pickWindow.SelectedItems.Where(c => c.Id == category.Id).Count() == 0)
+                    foreach (var category in pickWindow.SelectedItems)
                     {
-                        tmpDeleteCategory.Add(category.Id);
+                        if (selectedCategories.Where(c => c.Id == category.Id).Count() == 0)
+                        {
+                            tmpAddCatgory.Add(category.Id);
+                        }
+                    }
+
+                    foreach (var category in selectedCategories)
+                    {
+                        if (pickWindow.SelectedItems.Where(c => c.Id == category.Id).Count() == 0)
+                        {
+                            tmpDeleteCategory.Add(category.Id);
+                        }
                     }
                 }
                 AddCategoriesToNote(tmpAddCatgory, note.Id);
@@ -390,6 +403,7 @@ namespace DDEvernote.WPF.ViewModels
                         break;
                     }
                 }
+                SelectedNote = _client.GetNote(SelectedNote.Id);
             };
             pickWindow.ShowDialog();
         }
@@ -412,23 +426,27 @@ namespace DDEvernote.WPF.ViewModels
             pickWindow.Closed += (object o, EventArgs arg) =>
             {
                 var tmpAddNotesInCategory = new List<Guid>();
-                foreach (var note in pickWindow.SelectedItems)
-                {
-                    if (NotesOfSelectedCategory.Where(n => n.Id == note.Id).Count() == 0)
-                    {
-                        tmpAddNotesInCategory.Add(note.Id);
-                    }
-                }
                 var tmpDeleteNotesFromCategory = new List<Guid>();
-                foreach (var note in NotesOfSelectedCategory)
+                if (pickWindow.SelectedItems != null)
                 {
-                    if (pickWindow.SelectedItems.Where(n => n.Id == note.Id).Count() == 0)
+                    foreach (var note in pickWindow.SelectedItems)
                     {
-                        tmpDeleteNotesFromCategory.Add(note.Id);
+                        if (NotesOfSelectedCategory.Where(n => n.Id == note.Id).Count() == 0)
+                        {
+                            tmpAddNotesInCategory.Add(note.Id);
+                        }
+                    }
+
+                    foreach (var note in NotesOfSelectedCategory)
+                    {
+                        if (pickWindow.SelectedItems.Where(n => n.Id == note.Id).Count() == 0)
+                        {
+                            tmpDeleteNotesFromCategory.Add(note.Id);
+                        }
                     }
                 }
-                AddCategoriesToNote(tmpAddNotesInCategory, category.Id);
-                DeleteCategoriesFromNote(tmpDeleteNotesFromCategory, category.Id);
+                AddNotesInCategory(tmpAddNotesInCategory, category.Id);
+                DeleteNotesFromCategory(tmpDeleteNotesFromCategory, category.Id);
                 NotesOfSelectedCategory = new ObservableCollection<Note>(GetNotesByCategory(category.Id));
             };
             pickWindow.ShowDialog();
@@ -455,6 +473,7 @@ namespace DDEvernote.WPF.ViewModels
             pickWindow.Closed += (object o, EventArgs arg) =>
             {
                 var tmpShareNoteToUser = new List<Guid>();
+                var tmpDenyShareNoteToUser = new List<Guid>();
                 if (pickWindow.SelectedItems != null)
                 {
                     foreach (var note in pickWindow.SelectedItems)
@@ -464,32 +483,39 @@ namespace DDEvernote.WPF.ViewModels
                             tmpShareNoteToUser.Add(note.Id);
                         }
                     }
-                }
-                var tmpDenyShareNoteToUser = new List<Guid>();
-                foreach (var note in NotesOfSelectedUser)
-                {
-                    if (pickWindow.SelectedItems.Where(n => n.Id == note.Id).Count() == 0)
+
+                    foreach (var note in NotesOfSelectedUser)
                     {
-                        tmpDenyShareNoteToUser.Add(note.Id);
+                        if (pickWindow.SelectedItems.Where(n => n.Id == note.Id).Count() == 0)
+                        {
+                            tmpDenyShareNoteToUser.Add(note.Id);
+                        }
                     }
                 }
                 ShareNotesToUser(tmpShareNoteToUser, user.Id);
                 DenyShareNotesToUser(tmpDenyShareNoteToUser, user.Id);
 
-                NotesOfSelectedUser = new ObservableCollection<Note>(GetNotesBySharedUser(user.Id));
+                NotesOfSelectedUser = new ObservableCollection<Note>(GetSharedNotesByTwoUser(user.Id));
                 UserNotes = new ObservableCollection<Note>(getNotes(_user.Id));
             };
             pickWindow.ShowDialog();
         }
 
-        private IEnumerable<Note> GetNotesBySharedUser(Guid userId)
+        private IEnumerable<Note> GetSharedNotesByTwoUser(Guid userId)
         {
-            return _client.GetNotesBySharedUser(_user.Id, userId);
+            return _client.GetNotesBySharedUser(_user.Id, userId).Concat(_client.GetNotesBySharedUser(userId, _user.Id));
         }
 
         public void EditNote(Note note)
         {
             var noteWin = new NoteWindow(note);
+            noteWin.Closed += (object o, EventArgs args) =>
+              {
+                  if (noteWin.IsDeleted)
+                  {
+                      UserNotes.Remove(UserNotes.Where(n => n.Id == note.Id).Single());
+                  }
+              };
             noteWin.ShowDialog();
         }
 

@@ -5,22 +5,35 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DDEvernote.WPF.Views.Windows"
         mc:Ignorable="d"
-        Title="NoteWindow" Height="300" Width="300"
-        Closing="Window_Closing">
+        Title="Заметка" Height="300" Width="300" ResizeMode="NoResize">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        
-        <TextBox x:Name="titleNote" Grid.Row="0" Grid.Column="0" Text="{Binding Note.Title}"/>
-        <Button x:Name="saveNoteBtn" Grid.Row="0" Grid.Column="1" Content="Сохранить" Click="saveNoteBtn_Click"/>
-        <TextBox x:Name="textNote" Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Note.Text}"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch">
+            <TextBlock Text="Название: " FontSize="16" FontWeight="Bold" Margin="5,5,5,5"/>
+            <TextBox x:Name="titleNote" Grid.Row="0" Grid.Column="0" 
+                     Text="{Binding Note.Title, Mode=TwoWay}" Width="170" 
+                     HorizontalAlignment="Stretch" FontSize="16"/>
+        </StackPanel>
+
+        <TextBox x:Name="textNote" Grid.Row="1" Grid.ColumnSpan="3" 
+                 Text="{Binding Note.Text, Mode=TwoWay}" 
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 FontSize="15"/>
+
+        <Button x:Name="saveNoteBtn" Grid.Row="2" Grid.Column="0" Content="Сохранить" FontSize="16"
+                Click="saveNoteBtn_Click" Margin="3,3,3,3"/>
+        <Button x:Name="deleteNoteBtn" Grid.Row="2" Grid.Column="2" Content="Удалить" FontSize="16"
+                Click="deleteNoteBtn_Click" Margin="3,3,3,3"/>
     </Grid>
-    
+
 </Window>

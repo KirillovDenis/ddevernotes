@@ -40,22 +40,23 @@
                                         <ContextMenu>
                                             <MenuItem x:Name="shareNoteCtxMenu" Header="Поделиться" 
                                                       Click="shareNoteCtxMenu_Click"/>
-                                            <MenuItem x:Name="addCategoryToNoteCtxMenu" Header="Доабавить категорию" 
+                                            <MenuItem x:Name="addCategoryToNoteCtxMenu" Header="Добавить категорию" 
                                                       Click="addCategoryToNoteCtxMenu_Click"/>
                                             <MenuItem x:Name="delNoteCtxMenu" Header="Удалить" 
                                                       Click="delNoteCtxMenu_Click"
                                                       StaysOpenOnClick="False"/>
                                         </ContextMenu>
                                     </StackPanel.ContextMenu>
-                                    <TextBlock Text="{Binding Title}"/>
+                                    <TextBlock Text="{Binding Title}" Padding="3,0,0,0" FontSize="16" FontStyle="Italic"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="Свойства заметки: " FontSize="16" FontWeight="Bold" 
                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <StackPanel x:Name="noteProperty" Grid.Row="1" Grid.Column="2" 
-                                Visibility="{Binding VisibilityPropertyOfNote}">
+                    <StackPanel x:Name="noteProperty" Grid.Row="1" Grid.Column="2" VerticalAlignment="Stretch" 
+                                HorizontalAlignment="Center"
+                                Visibility="{Binding VisibilityPropertyOfNote}" >
                         <TextBlock x:Name="noteTitleProp" 
                                    Text="{Binding SelectedNote.Title, StringFormat=Название: {0}}"/>
                         <TextBlock x:Name="noteCreateTimeProp" 
@@ -65,20 +66,21 @@
                         <TextBlock x:Name="noteOwnerProp" 
                                    Text="{Binding SelectedNote.Owner.Name, StringFormat=Владелец: {0}}"/>
                         <TextBlock Text="Категории:"/>
-                        <ListView x:Name="categoriesBySelectedNote" 
-                                  ItemsSource="{Binding CategoriesOfSelectedNote, Mode=OneWay}">
+                        <ListView x:Name="categoriesBySelectedNote" BorderThickness="0" IsManipulationEnabled="False"
+                                  IsEnabled="False"
+                                  ItemsSource="{Binding SelectedNote.Categories, Mode=OneWay}">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Title}"/>
+                                    <TextBlock Text="{Binding Title}" FontStyle="Italic"/>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
                         <TextBlock Text="Общий доступ имеют:"/>
-                        <ListView x:Name="sharedBySelectedNote" 
+                        <ListView x:Name="sharedBySelectedNote" BorderThickness="0" IsEnabled="False"
                                   ItemsSource="{Binding SelectedNote.Shared, Mode=OneWay}">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Name}"/>
+                                    <TextBlock Text="{Binding Name}" FontStyle="Italic"/>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
@@ -101,9 +103,8 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <GridSplitter Grid.Row="1" Grid.Column="1" ShowsPreview="False" Width="3"
+                    <GridSplitter Grid.Row="1" Grid.Column="1" ShowsPreview="False" Width="3" IsEnabled="False"
                                 HorizontalAlignment="Center" VerticalAlignment="Stretch" />
-
                     <Button x:Name="createCategoryBtn" Grid.Row="0" Grid.Column="0" 
                             Click="createCategoryBtn_Click" 
                                 FontSize="16" Content="Создать категорию"
@@ -123,7 +124,7 @@
                                                       Click="delCategoryCtxMenu_Click"/>
                                         </ContextMenu>
                                     </StackPanel.ContextMenu>
-                                    <TextBlock Text="{Binding Title}"/>
+                                    <TextBlock Text="{Binding Title}" Padding="3,0,0,0" FontSize="16" FontStyle="Italic"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -134,15 +135,17 @@
                               ItemsSource="{Binding NotesOfSelectedCategory, Mode=OneWay}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel x:Name="noteOfcategoryItem" MouseLeftButtonDown="noteItem_MouseLeftButtonDown"
+                                <StackPanel x:Name="noteOfcategoryItem"
                                             HorizontalAlignment="Stretch">
                                     <StackPanel.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem x:Name="shareNoteCtxMenu" Header="Поделиться" Click="shareNoteCtxMenu_Click"/>
-                                            <MenuItem x:Name="delNoteCtxMenu" Header="Удалить" Click="delNoteCtxMenu_Click"/>
+                                            <MenuItem x:Name="shareNoteCtxMenu" Header="Поделиться" 
+                                                      Click="shareNoteCtxMenu_Click"/>
+                                            <MenuItem x:Name="delNoteCtxMenu" Header="Удалить" 
+                                                      Click="delNoteCtxMenu_Click"/>
                                         </ContextMenu>
                                     </StackPanel.ContextMenu>
-                                    <TextBlock Text="{Binding Title}"/>
+                                    <TextBlock Text="{Binding Title}" Padding="3,0,0,0" FontSize="16" FontStyle="Italic"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -152,7 +155,7 @@
         </TabItem>
         <TabItem x:Name="usersTab">
             <TabItem.Header>
-                <TextBlock Margin="3" Text="Пользователь" FontSize="18"/>
+                <TextBlock Margin="3" Text="Пользователи" FontSize="18"/>
             </TabItem.Header>
             <TabItem.Content>
                 <Grid>
@@ -172,9 +175,9 @@
                         <TextBlock x:Name="currentUser" FontSize="16" Text="{Binding User.Name, Mode=OneWay}"/>
 
                         <Button x:Name="editUserBtn" Content="Редактировать" Click="editUserBtn_Click" 
-                                FontSize="16" Margin="10,0,5,0"/>
+                                FontSize="16" Margin="10,0,0,0" Height="30"/>
                         <Button x:Name="logOutBtn" Content="Выйти" Click="logOutBtn_Click" 
-                                FontSize="16"/>
+                                FontSize="16" Height="30"/>
 
                     </StackPanel>
                     <ListView x:Name="users" Grid.Row="1" Grid.Column="0" 
@@ -185,10 +188,11 @@
                                 <StackPanel>
                                     <StackPanel.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem x:Name="usersShareNoteCtxMenu" Header="Поделиться" Click="usersShareNoteCtxMenu_Click"/>
+                                            <MenuItem x:Name="usersShareNoteCtxMenu" Header="Поделиться" 
+                                                      Click="usersShareNoteCtxMenu_Click"/>
                                         </ContextMenu>
                                     </StackPanel.ContextMenu>
-                                    <TextBlock Text="{Binding Name}"/>
+                                    <TextBlock Text="{Binding Name}" Padding="3,0,0,0" FontSize="16" FontStyle="Italic"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -202,10 +206,11 @@
                                 <StackPanel x:Name="noteOfUserItem" >
                                     <StackPanel.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem x:Name="denyShare" Header="Перестать делиться" Click="denyShare_Click"/>
+                                            <MenuItem x:Name="denyShare" Header="Перестать делиться" 
+                                                      Click="denyShare_Click"/>
                                         </ContextMenu>
                                     </StackPanel.ContextMenu>
-                                    <TextBlock Text="{Binding Title}"/>
+                                    <TextBlock Text="{Binding Title}" Padding="3,0,0,0" FontSize="16" FontStyle="Italic"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>

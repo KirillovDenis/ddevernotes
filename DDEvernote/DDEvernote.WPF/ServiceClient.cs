@@ -103,7 +103,6 @@ namespace DDEvernote.WPF
         public void AddNoteInCategory(Guid noteId, Guid categoryId)
         {
             var answer = _client.PostAsJsonAsync($"notes/{noteId}/add_category", categoryId).Result.Content.ReadAsAsync<Guid>().Result;
-            return;
         }
 
         public void DeleteNoteFromCategory(Guid noteId, Guid categoryId)

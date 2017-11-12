@@ -25,15 +25,12 @@ namespace DDEvernote.WPF
     /// </summary>
     public partial class MainPage : Page
     {
-
-
         public MainPage(User user)
         {
             InitializeComponent();
             this.DataContext = new ModelMainPage(user);
         }
-
-
+        
         private void editUserBtn_Click(object sender, RoutedEventArgs e)
         {
             ((ModelMainPage)this.DataContext).EditUser();
@@ -60,20 +57,6 @@ namespace DDEvernote.WPF
             var menu = (ContextMenu)item.Parent;
             var note = (Note)menu.DataContext;
             ((ModelMainPage)this.DataContext).DeleteNote(note.Id);
-        }
-
-        private void noteItem_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            //var clickedNote = ((StackPanel)sender).DataContext as Note;
-            //Window noteWin = new NoteWindow(clickedNote);
-            //((StackPanel)sender).IsEnabled = false;
-            //noteWin.Closed += (object o, EventArgs arg) => { ((StackPanel)sender).IsEnabled = true; };
-            //noteWin.Show();
-        }
-
-        private void noteItem_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            
         }
 
         private void createCategoryBtn_Click(object sender, RoutedEventArgs e)
@@ -156,7 +139,10 @@ namespace DDEvernote.WPF
             var item = (MenuItem)sender;
             var menu = (ContextMenu)item.Parent;
             var note = (Note)menu.DataContext;
-            ((ModelMainPage)this.DataContext).DenyShareNote(note.Id);
+            if (note.Owner.Id == ((ModelMainPage)this.DataContext).User.Id)
+            {
+                ((ModelMainPage)this.DataContext).DenyShareNote(note.Id);
+            }
         }
     }
 }

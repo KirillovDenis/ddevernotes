@@ -83,7 +83,7 @@ namespace DDEvernote.Api.Controllers
         public Guid AddCategoryToNote(Guid noteId, [FromBody]Guid categoryId)
         {
             _logger.Info("Запрос на добавление заметки с id: \"{0}\" в категорию с id: \"{1}\"", noteId, categoryId);
-            _notesRepository.AddNoteInCategory(categoryId, noteId);
+            _notesRepository.AddNoteInCategory(noteId, categoryId);
             return noteId;
         }
 

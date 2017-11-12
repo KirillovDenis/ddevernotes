@@ -29,5 +29,13 @@ namespace DDEvernote.WPF.ViewModels
                 Note = _serviceclient.UpdateNote(this.Note);
             }
         }
+
+        public void deleteNote()
+        {
+            if (this.Note.Id != Guid.Empty)
+            {
+                _serviceclient.DeleteNote(this.Note.Id);
+            }
+        }
     }
 }

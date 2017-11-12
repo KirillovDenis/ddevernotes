@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DDEvernote.WPF.Views.Windows"
         mc:Ignorable="d"
-        Title="PickItemsDialogWindow" Height="300" Width="300">
+        Title="Окно выбора" Height="300" Width="300" ResizeMode="NoResize">
 
     <StackPanel>
         <ListView x:Name="list" ItemsSource="{Binding InputList, Mode=OneWay}" SelectionMode="Multiple">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Title}"/>
+                    <TextBlock Text="{Binding Title}" Padding="3,0,0,0" FontSize="15" FontStyle="Italic"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
             <ListView.ItemContainerStyle>
@@ -20,7 +20,7 @@
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>
-        <Button x:Name="saveBtn" Content="Выбрать" Click="saveBtn_Click"/>
+        <Button x:Name="saveBtn" Content="Выбрать" Click="saveBtn_Click" Margin="5,5,5,5" FontSize="16"/>
     </StackPanel>
 
 </Window>

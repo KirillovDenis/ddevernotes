@@ -260,7 +260,7 @@ namespace DDEvernote.DataLayer.Sql
                                 Owner = owner,
                                 Text = reader.GetString(reader.GetOrdinal("text")),
                                 Shared = usersRepository.GetUsersBySharedNote(new Guid(reader.GetString(reader.GetOrdinal("id")))),
-                                Categories = categoriesRepository.GetUserCategories(userId),
+                                Categories = categoriesRepository.GetCategoriesOfNote(new Guid(reader.GetString(reader.GetOrdinal("id")))),
                                 Changed = reader.GetDateTime(reader.GetOrdinal("changed_time")),
                                 Created = reader.GetDateTime(reader.GetOrdinal("created_time"))
                             });
