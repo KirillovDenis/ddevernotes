@@ -11,6 +11,7 @@ namespace DDEvernote.Api.Filters
         {
             if (actionContext.ModelState.IsValid == false)
             {
+                Logger.Log.Instance.Error("Ошибка валидации");
                 actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, actionContext.ModelState);
             }
         }

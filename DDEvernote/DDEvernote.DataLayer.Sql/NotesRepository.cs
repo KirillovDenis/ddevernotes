@@ -120,7 +120,7 @@ namespace DDEvernote.DataLayer.Sql
             }
         }
 
-        public void AddNoteInCategory(Guid categoryId, Guid noteId)
+        public void AddNoteInCategory(Guid noteId, Guid categoryId)
         {
             _logger.Debug("Начато добавление заметки с id: \"{0}\" в категорию с id: \"{1}\"", noteId, categoryId);
             ICategoriesRepository categoriesRepository = new CategoriesRepository(_connectionString);
@@ -333,6 +333,125 @@ namespace DDEvernote.DataLayer.Sql
                         }
                         _logger.Debug("Заметка с id: \"{0}\" не найдена", noteId);
                         return false;
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<Note> GetSharedNotesByUser(Guid userId)
+        {
+            _logger.Debug("Начато получение общих заметок пользователя с id: \"{0}\"", userId);
+            ICategoriesRepository categoriesRepository = new CategoriesRepository(_connectionString);
+            IUsersRepository usersRepository = new UsersRepository(_connectionString);
+            if (!usersRepository.IsExist(userId))
+            {
+                throw new UserNotFoundException($"Пользователя с id: \"{userId}\" не существует", userId);
+            }
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            {
+                sqlConnection.Open();
+                using (var command = sqlConnection.CreateCommand())
+                {
+                    _logger.Debug("Запрос к базе данных на получение общих заметок пользователя с id: \"{0}\"", userId);
+                    command.CommandText = "select notes.id, notes.title, notes.user_id, notes.text, notes.changed_time, notes.created_time " +
+                                          "from notes inner join shared " +
+                                          "on notes.id=shared.note_id where shared.user_id=@userId;";
+                    command.Parameters.AddWithValue("@userId", userId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        var listOfNotes = new List<Note>();
+                        while (reader.Read())
+                        {
+                            listOfNotes.Add(new Note
+                            {
+                                Id = new Guid(reader.GetString(reader.GetOrdinal("id"))),
+                                Title = reader.GetString(reader.GetOrdinal("title")),
+                                Owner = usersRepository.Get(new Guid(reader.GetString(reader.GetOrdinal("user_id")))),
+                                Text = reader.GetString(reader.GetOrdinal("text")),
+                                Shared = usersRepository.GetUsersBySharedNote(new Guid(reader.GetString(reader.GetOrdinal("id")))),
+                                Categories = categoriesRepository.GetCategoriesOfNote(new Guid(reader.GetString(reader.GetOrdinal("id")))),
+                                Changed = reader.GetDateTime(reader.GetOrdinal("changed_time")),
+                                Created = reader.GetDateTime(reader.GetOrdinal("created_time"))
+                            });
+                        }
+                        _logger.Info("Получено \"{0}\" общих заметок для пользователя с id: \"{1}\"", listOfNotes.Count(), userId);
+                        return listOfNotes;
+                    }
+                }
+            }
+        }
+
+        public void DeleteNoteFromCategory(Guid categoryId, Guid noteId)
+        {
+            _logger.Debug("Начато удаление заметки с id: \"{0}\" из категории с id: \"{1}\"", noteId, categoryId);
+            ICategoriesRepository categoriesRepository = new CategoriesRepository(_connectionString);
+            if (!IsExist(noteId))
+            {
+                throw new NoteNotFoundException($"Заметки с id: \"{noteId}\" не существует", noteId);
+            }
+            else if (!categoriesRepository.IsExist(categoryId))
+            {
+                throw new CategoryNotFoundException($"Категория с id: \"{categoryId}\" не существует", categoryId);
+            }
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            {
+                sqlConnection.Open();
+                using (var command = sqlConnection.CreateCommand())
+                {
+                    _logger.Debug("Запрос к базе данных на удаление заметки с id: \"{0}\" из категории с id: \"{1}\"", noteId, categoryId);
+                    command.CommandText = "delete from category_notes " +
+                                          "where category_id=@categoryId and note_id=@noteId;";
+                    command.Parameters.AddWithValue("@categoryid", categoryId);
+                    command.Parameters.AddWithValue("@noteId", noteId);
+                    command.ExecuteNonQuery();
+                }
+                _logger.Info("Удалена заметка с id: \"{0}\" из категории с id: \"{1}\"", noteId, categoryId);
+            }
+        }
+
+        public IEnumerable<Note> GetNotesBySharedUser(Guid ownerUserId, Guid sharedUserId)
+        {
+            _logger.Debug("Начато получение общих заметок пользователя c id: \"{0}\" от пользователя с id: \"{1}\"", sharedUserId, ownerUserId);
+            ICategoriesRepository categoriesRepository = new CategoriesRepository(_connectionString);
+            IUsersRepository usersRepository = new UsersRepository(_connectionString);
+            if (!usersRepository.IsExist(ownerUserId))
+            {
+                throw new UserNotFoundException($"Пользователя с id: \"{ownerUserId}\" не существует", ownerUserId);
+            }
+            if (!usersRepository.IsExist(sharedUserId))
+            {
+                throw new UserNotFoundException($"Пользователя с id: \"{sharedUserId}\" не существует", sharedUserId);
+            }
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            {
+                sqlConnection.Open();
+                using (var command = sqlConnection.CreateCommand())
+                {
+                    _logger.Debug("Запрос к базе данных на получение общих заметок пользователя c id: \"{0}\" от пользователя с id: \"{1}\"", sharedUserId, ownerUserId);
+                    command.CommandText = "select notes.id, notes.title, notes.user_id, notes.text, notes.changed_time, notes.created_time " +
+                                          "from notes inner join shared " +
+                                          "on notes.id=shared.note_id where shared.user_id=@userId and notes.user_id=@ownerId;";
+                    command.Parameters.AddWithValue("@userId", sharedUserId);
+                    command.Parameters.AddWithValue("@ownerId", ownerUserId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        var listOfNotes = new List<Note>();
+                        while (reader.Read())
+                        {
+                            listOfNotes.Add(new Note
+                            {
+                                Id = new Guid(reader.GetString(reader.GetOrdinal("id"))),
+                                Title = reader.GetString(reader.GetOrdinal("title")),
+                                Owner = usersRepository.Get(new Guid(reader.GetString(reader.GetOrdinal("user_id")))),
+                                Text = reader.GetString(reader.GetOrdinal("text")),
+                                Shared = usersRepository.GetUsersBySharedNote(new Guid(reader.GetString(reader.GetOrdinal("id")))),
+                                Categories = categoriesRepository.GetCategoriesOfNote(new Guid(reader.GetString(reader.GetOrdinal("id")))),
+                                Changed = reader.GetDateTime(reader.GetOrdinal("changed_time")),
+                                Created = reader.GetDateTime(reader.GetOrdinal("created_time"))
+                            });
+                        }
+                        _logger.Info("Получено \"{0}\" общих заметок для пользователя с id: \"{1}\" от пользователя с id: \"{2}\"", listOfNotes.Count(), sharedUserId, ownerUserId);
+                        return listOfNotes;
                     }
                 }
             }

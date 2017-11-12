@@ -15,5 +15,7 @@ namespace DDEvernote.DataLayer
         void Delete(Guid userId);
         IEnumerable<User> GetUsersBySharedNote(Guid noteId);
         bool IsExist(Guid userId);
+        User Get(String userName);
+        IEnumerable<User> GetUsers();
     }
 }

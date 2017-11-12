@@ -183,5 +183,68 @@ namespace DDEvernote.DataLayer.Sql
                 }
             }
         }
+
+        public User Get(String userName)
+        {
+            _logger.Debug("Начато получение пользователя с именем: \"{0}\"", userName);
+            ICategoriesRepository _categoriesRepository = new CategoriesRepository(_connectionString);
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            {
+                sqlConnection.Open();
+                using (var command = sqlConnection.CreateCommand())
+                {
+                    _logger.Debug("Запрос к базе данных на получение пользователся с именем: \"{0}\"", userName);
+                    command.CommandText = "select id, password  from users where name = @userName;";
+                    command.Parameters.AddWithValue("@userName", userName);
+                    var user = new User();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (!reader.Read())
+                        {
+                            throw new ArgumentException($"Пользователь с именем: \"{userName}\" не существует");
+                        }
+                        user.Id = new Guid(reader.GetString(reader.GetOrdinal("id")));
+                        user.Name = userName;
+                        user.Password = reader.GetString(reader.GetOrdinal("password"));
+                    }
+                    _logger.Debug("Получение категорий пользователя с id: \"{0}\"", user.Id);
+                    user.Categories = _categoriesRepository.GetUserCategories(user.Id);
+                    _logger.Info("Получен пользователь с id: \"{0}\", name: \"{1}\" (имеет категорий: \"{2}\")", user.Id, user.Name, user.Categories.Count());
+                    return user;
+                }
+            }
+        }
+
+        public IEnumerable<User> GetUsers()
+        {
+            _logger.Debug("Начато получение всех пользоватей с именем");
+                ICategoriesRepository _categoriesRepository = new CategoriesRepository(_connectionString);
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            {
+                sqlConnection.Open();
+                using (var command = sqlConnection.CreateCommand())
+                {
+                    _logger.Debug("Запрос к базе данных на получение всех пользователей");
+                    command.CommandText = "select * from users";
+                    var users = new List<User>();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            users.Add(
+                          new User
+                          {
+                              Id = new Guid(reader.GetString(reader.GetOrdinal("id"))),
+                              Name = reader.GetString(reader.GetOrdinal("name")),
+                              Password = reader.GetString(reader.GetOrdinal("password")),
+                              Categories = _categoriesRepository.GetUserCategories(new Guid(reader.GetString(reader.GetOrdinal("id"))))
+                        });
+                        }
+                    }
+                    _logger.Info("Полученo {0} пользователей",users.Count());
+                    return users;
+                }
+            }
+        }
     }
 }

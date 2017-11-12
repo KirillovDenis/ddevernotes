@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Category.cs" />
+    <Compile Include="GeneralType.cs" />
     <Compile Include="CategoryNotFoundException.cs" />
     <Compile Include="Note.cs" />
     <Compile Include="NoteNotFoundException.cs" />

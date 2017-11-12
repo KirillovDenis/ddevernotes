@@ -82,6 +82,21 @@ namespace DDEvernote.Api.Controllers
             _logger.Info("Запрос на получение категорий пользователся с id: \"{0}\"", userId);
             return _categoriesRepository.GetUserCategories(userId);
         }
+        
+
+        /// <summary>
+        /// Получение всех категорий заметки
+        /// </summary>
+        /// <param name="noteId">Идентификтор заметки</param>
+        /// <returns>Список категорий</returns>
+        [HttpGet]
+        [Route("api/notes/{noteId}/categories")]
+        [NotesExceptionFilter]
+        public IEnumerable<Category> GetCategoriesByNote(Guid noteId)
+        {
+            _logger.Info("Запрос на получение категорий заметки с id: \"{0}\"", noteId);
+            return _categoriesRepository.GetCategoriesOfNote(noteId);
+        }
 
         /// <summary>
         /// Удаление категории

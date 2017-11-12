@@ -36,6 +36,29 @@ namespace DDEvernote.DataLayer.Sql.Tests
             Assert.AreEqual(user.Password, createdUser.Password);
         }
 
+
+        [TestMethod]
+        public void ShouldGetUserByName()
+        {
+            //arrange
+            var user = new User
+            {
+                Name = "test",
+                Password = "123"
+            };
+
+            //act
+            var categoriesRepository = new CategoriesRepository(ConnectionString);
+            var userRepository = new UsersRepository(ConnectionString);
+
+            user = userRepository.Create(user);
+            _tempUsers.Add(user.Id);
+            var createdUser = userRepository.Get(user.Name);
+
+            //asserts
+            Assert.AreEqual(user.Id, createdUser.Id);
+        }
+
         [TestMethod]
         public void ShouldGetUsersByShraredNoteId()
         {

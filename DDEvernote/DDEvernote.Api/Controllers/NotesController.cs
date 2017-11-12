@@ -77,13 +77,29 @@ namespace DDEvernote.Api.Controllers
         /// <param name="noteId">Идентификатор заметки</param>
         /// <param name="categoryId">Идентификатор категории</param>
         [HttpPost]
-        [Route("api/notes/{noteId}/add_category/{categoryId}")]
+        [Route("api/notes/{noteId}/add_category")]
         [NotesExceptionFilter]
         [CategoriesExceptionFilter]
-        public void AddCategoryToNote(Guid noteId, Guid categoryId)
+        public Guid AddCategoryToNote(Guid noteId, [FromBody]Guid categoryId)
         {
             _logger.Info("Запрос на добавление заметки с id: \"{0}\" в категорию с id: \"{1}\"", noteId, categoryId);
             _notesRepository.AddNoteInCategory(categoryId, noteId);
+            return noteId;
+        }
+
+        /// <summary>
+        /// Удаляет заметку из существующей категории пользователя
+        /// </summary>
+        /// <param name="noteId">Идентификатор заметки</param>
+        /// <param name="categoryId">Идентификатор категории</param>
+        [HttpDelete]
+        [Route("api/notes/{noteId}/delete_category/{categoryId}")]
+        [NotesExceptionFilter]
+        [CategoriesExceptionFilter]
+        public void DeleteCategoryFromNote(Guid noteId, Guid categoryId)
+        {
+            _logger.Info("Запрос на удаление заметки с id: \"{0}\" из категории с id: \"{1}\"", noteId, categoryId);
+            _notesRepository.DeleteNoteFromCategory(categoryId, noteId);
         }
 
         /// <summary>
@@ -92,13 +108,14 @@ namespace DDEvernote.Api.Controllers
         /// <param name="noteId">Идентификатор заметки</param>
         /// <param name="userId">Идентификатор пользователя</param>
         [HttpPost]
-        [Route("api/notes/{noteId}/shares/{userId}")]
+        [Route("api/notes/{noteId}/shares")]
         [NotesExceptionFilter]
         [UsersExceptionFilter]
-        public void ShareNote(Guid noteId, Guid userId)
+        public Guid ShareNote(Guid noteId, [FromBody]Guid userId)
         {
             _logger.Info("Запрос на предоставление общего доступа к заметке с id: \"{0}\" пользователю с id: \"{1}\"", noteId, userId);
             _notesRepository.Share(noteId, userId);
+            return userId;
         }
 
         /// <summary>
@@ -107,7 +124,7 @@ namespace DDEvernote.Api.Controllers
         /// <param name="noteId">Идентификатор заметки</param>
         /// <param name="userId">Идентификатор пользователя</param>
         [HttpDelete]
-        [Route("api/note/{noteId}/shares/{userId}")]
+        [Route("api/notes/{noteId}/shares/{userId}")]
         [NotesExceptionFilter]
         [UsersExceptionFilter]
         public void DenyShared(Guid noteId, Guid userId)
@@ -117,7 +134,7 @@ namespace DDEvernote.Api.Controllers
         }
 
         /// <summary>
-        /// Удаление замтки
+        /// Удаление заметки
         /// </summary>
         /// <param name="noteId">Идентификтор заметки</param>
         [HttpDelete]
@@ -143,7 +160,36 @@ namespace DDEvernote.Api.Controllers
         }
 
         /// <summary>
-        /// Получает все заметки из определнной категории
+        /// Получение общих заметок пользователя
+        /// </summary>
+        /// <param name="userId">Идентификатор пользователя</param>
+        /// <returns>Список заметок</returns>
+        [HttpGet]
+        [Route("api/users/{userId}/shared")]
+        [UsersExceptionFilter]
+        public IEnumerable<Note> GetSharedNotesByUser(Guid userId)
+        {
+            _logger.Info("Запрос на получение общих заметок пользователя с id: \"{0}\"", userId);
+            return _notesRepository.GetSharedNotesByUser(userId);
+        }
+
+        /// <summary>
+        /// Получение общих заметок пользователя от определенного пользователя
+        /// </summary>
+        /// <param name="ownerUserId">Идентификатор хозяина заметок</param>
+        /// <param name="sharedUserId">Идентификатор пользователя, с которым поделилиськ</param>
+        /// <returns>Список заметок</returns>
+        [HttpGet]
+        [Route("api/users/{ownerUserId}/shared/{sharedUserId}")]
+        [UsersExceptionFilter]
+        public IEnumerable<Note> GetNotesBySharedUser(Guid ownerUserId, Guid sharedUserId)
+        {
+            _logger.Info("Запрос на получение общих заметок пользователя c id: \"{0}\" от пользователя с id: \"{1}\"", sharedUserId, ownerUserId);
+            return _notesRepository.GetNotesBySharedUser(ownerUserId, sharedUserId);
+        }
+
+        /// <summary>
+        /// Получает все заметки из определенной категории
         /// </summary>
         /// <param name="categoryId">Идентификатор категории</param>
         /// <returns>Список заметок</returns>

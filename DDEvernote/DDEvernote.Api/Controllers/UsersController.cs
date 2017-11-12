@@ -4,6 +4,7 @@ using DDEvernote.Model;
 using DDEvernote.DataLayer.Sql;
 using DDEvernote.DataLayer;
 using DDEvernote.Api.Filters;
+using System.Collections.Generic;
 
 namespace DDEvernote.Api.Controllers
 {
@@ -76,6 +77,47 @@ namespace DDEvernote.Api.Controllers
         {
             _logger.Info("Запрос на удаление пользователя с id: \"{0}\"", userId);
             _usersRepository.Delete(userId);
+        }
+
+        /// <summary>
+        /// Получение пользователя по имени
+        /// </summary>
+        /// <param name="userName">Имя пользователя</param>
+        /// <returns>Пользователь</returns>
+        [HttpGet]
+        [Route("api/users/name/{userName}")]
+        [UsersExceptionFilter]
+        public User GetUserByName(String userName)
+        {
+            _logger.Info("Зарос на получение пользователя с именем: \"{0}\"", userName);
+            return _usersRepository.Get(userName);
+        }
+
+        /// <summary>
+        /// Получение всех пользователей
+        /// </summary>
+        /// <returns>Пользователи</returns>
+        [HttpGet]
+        [Route("api/users")]
+        [UsersExceptionFilter]
+        public IEnumerable<User> GetUsers()
+        {
+            _logger.Info("Зарос на получение всех пользователей");
+            return _usersRepository.GetUsers();
+        }
+
+        /// <summary>
+        /// Получение общих пользователей для заметки
+        /// </summary>
+        /// <param name="noteId">Идентификатор заметки</param>
+        /// <returns>Пользователи</returns>
+        [HttpGet]
+        [Route("api/notes/{noteId}/shared")]
+        [NotesExceptionFilter]
+        public IEnumerable<User> GetUsersBySharedNote(Guid noteId)
+        {
+            _logger.Info("Зарос на получение общих пользователей для заметки с id: \"{0}\"", noteId);
+            return _usersRepository.GetUsersBySharedNote(noteId);
         }
     }
 

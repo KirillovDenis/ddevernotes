@@ -1,0 +1,218 @@
+﻿<Page x:Class="DDEvernote.WPF.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:DDEvernote.WPF"
+      mc:Ignorable="d" 
+      d:DesignHeight="300" d:DesignWidth="300"
+      Title="MainPage">
+
+    <TabControl>
+        <TabItem x:Name="notesTab">
+            <TabItem.Header>
+                <TextBlock Margin="3" Text="Заметки" FontSize="18"/>
+            </TabItem.Header>
+            <TabItem.Content>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <GridSplitter Grid.Row="1" Grid.Column="1" ShowsPreview="False" Width="3"
+                                HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+                    <Button x:Name="createNoteBtn" Grid.Row="0" Grid.Column="0" FontSize="16"
+                            Click="createNoteBtn_Click" Height="30" Width="auto" Content="Создать заметку"/>
+                    <ListView x:Name="noteList" Grid.Row="1" Grid.Column="0" 
+                              ItemsSource="{Binding UserNotes, Mode=OneWay}" 
+                              MouseDoubleClick="noteList_MouseDoubleClick"
+                              SelectionChanged="noteList_SelectionChanged">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel x:Name="noteItem"
+                                            HorizontalAlignment="Stretch">
+                                    <StackPanel.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem x:Name="shareNoteCtxMenu" Header="Поделиться" 
+                                                      Click="shareNoteCtxMenu_Click"/>
+                                            <MenuItem x:Name="addCategoryToNoteCtxMenu" Header="Доабавить категорию" 
+                                                      Click="addCategoryToNoteCtxMenu_Click"/>
+                                            <MenuItem x:Name="delNoteCtxMenu" Header="Удалить" 
+                                                      Click="delNoteCtxMenu_Click"
+                                                      StaysOpenOnClick="False"/>
+                                        </ContextMenu>
+                                    </StackPanel.ContextMenu>
+                                    <TextBlock Text="{Binding Title}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Свойства заметки: " FontSize="16" FontWeight="Bold" 
+                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <StackPanel x:Name="noteProperty" Grid.Row="1" Grid.Column="2" 
+                                Visibility="{Binding VisibilityPropertyOfNote}">
+                        <TextBlock x:Name="noteTitleProp" 
+                                   Text="{Binding SelectedNote.Title, StringFormat=Название: {0}}"/>
+                        <TextBlock x:Name="noteCreateTimeProp" 
+                                   Text="{Binding SelectedNote.Created, StringFormat=Cоздана: {0}}"/>
+                        <TextBlock x:Name="noteChangedTimeProp" 
+                                   Text="{Binding SelectedNote.Changed, StringFormat=Изменена: {0}}"/>
+                        <TextBlock x:Name="noteOwnerProp" 
+                                   Text="{Binding SelectedNote.Owner.Name, StringFormat=Владелец: {0}}"/>
+                        <TextBlock Text="Категории:"/>
+                        <ListView x:Name="categoriesBySelectedNote" 
+                                  ItemsSource="{Binding CategoriesOfSelectedNote, Mode=OneWay}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Title}"/>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <TextBlock Text="Общий доступ имеют:"/>
+                        <ListView x:Name="sharedBySelectedNote" 
+                                  ItemsSource="{Binding SelectedNote.Shared, Mode=OneWay}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}"/>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
+                </Grid>
+            </TabItem.Content>
+        </TabItem>
+        <TabItem x:Name="categoriesTab">
+            <TabItem.Header>
+                <TextBlock Margin="3" Text="Категории" FontSize="18"/>
+            </TabItem.Header>
+            <TabItem.Content>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <GridSplitter Grid.Row="1" Grid.Column="1" ShowsPreview="False" Width="3"
+                                HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+
+                    <Button x:Name="createCategoryBtn" Grid.Row="0" Grid.Column="0" 
+                            Click="createCategoryBtn_Click" 
+                                FontSize="16" Content="Создать категорию"
+                                Height="30" Width="auto"/>
+                    <ListView x:Name="categoryList" Grid.Row="1" Grid.Column="0" 
+                              ItemsSource="{Binding UserCategories, Mode=OneWay}"
+                              SelectionChanged="categoryList_SelectionChanged">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel x:Name="categoryItem" 
+                                            HorizontalAlignment="Stretch">
+                                    <StackPanel.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem x:Name="addNoteInCategory" Header="Добавить к заметке"
+                                                      Click="addNoteInCategory_Click"/>
+                                            <MenuItem x:Name="delCategoryCtxMenu" Header="Удалить" 
+                                                      Click="delCategoryCtxMenu_Click"/>
+                                        </ContextMenu>
+                                    </StackPanel.ContextMenu>
+                                    <TextBlock Text="{Binding Title}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Заметки в категории: " FontSize="16" FontWeight="Bold" 
+                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <ListView x:Name="notesOfCategoryList" Grid.Row="1" Grid.Column="2" 
+                              ItemsSource="{Binding NotesOfSelectedCategory, Mode=OneWay}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel x:Name="noteOfcategoryItem" MouseLeftButtonDown="noteItem_MouseLeftButtonDown"
+                                            HorizontalAlignment="Stretch">
+                                    <StackPanel.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem x:Name="shareNoteCtxMenu" Header="Поделиться" Click="shareNoteCtxMenu_Click"/>
+                                            <MenuItem x:Name="delNoteCtxMenu" Header="Удалить" Click="delNoteCtxMenu_Click"/>
+                                        </ContextMenu>
+                                    </StackPanel.ContextMenu>
+                                    <TextBlock Text="{Binding Title}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </TabItem.Content>
+        </TabItem>
+        <TabItem x:Name="usersTab">
+            <TabItem.Header>
+                <TextBlock Margin="3" Text="Пользователь" FontSize="18"/>
+            </TabItem.Header>
+            <TabItem.Content>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <GridSplitter Grid.Row="1" Grid.Column="1" ShowsPreview="False" Width="3"
+                                HorizontalAlignment="Center" VerticalAlignment="Stretch" IsEnabled="False" />
+                    <StackPanel Grid.Row="0" Grid.ColumnSpan="3" Orientation="Horizontal">
+                        <TextBlock Text="Вы: " FontSize="16" FontWeight="Bold"/>
+                        <TextBlock x:Name="currentUser" FontSize="16" Text="{Binding User.Name, Mode=OneWay}"/>
+
+                        <Button x:Name="editUserBtn" Content="Редактировать" Click="editUserBtn_Click" 
+                                FontSize="16" Margin="10,0,5,0"/>
+                        <Button x:Name="logOutBtn" Content="Выйти" Click="logOutBtn_Click" 
+                                FontSize="16"/>
+
+                    </StackPanel>
+                    <ListView x:Name="users" Grid.Row="1" Grid.Column="0" 
+                              ItemsSource="{Binding Users, Mode=OneWay}"
+                              SelectionChanged="users_SelectionChanged">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <StackPanel.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem x:Name="usersShareNoteCtxMenu" Header="Поделиться" Click="usersShareNoteCtxMenu_Click"/>
+                                        </ContextMenu>
+                                    </StackPanel.ContextMenu>
+                                    <TextBlock Text="{Binding Name}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Общие заметки: " FontSize="16" FontWeight="Bold" 
+                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <ListView x:Name="users2" Grid.Row="1" Grid.Column="2"
+                              ItemsSource="{Binding NotesOfSelectedUser, Mode=OneWay}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel x:Name="noteOfUserItem" >
+                                    <StackPanel.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem x:Name="denyShare" Header="Перестать делиться" Click="denyShare_Click"/>
+                                        </ContextMenu>
+                                    </StackPanel.ContextMenu>
+                                    <TextBlock Text="{Binding Title}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </TabItem.Content>
+        </TabItem>
+    </TabControl>
+
+</Page>

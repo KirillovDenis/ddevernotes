@@ -1,0 +1,26 @@
+﻿<Window x:Class="DDEvernote.WPF.Views.Windows.PickItemsDialogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DDEvernote.WPF.Views.Windows"
+        mc:Ignorable="d"
+        Title="PickItemsDialogWindow" Height="300" Width="300">
+
+    <StackPanel>
+        <ListView x:Name="list" ItemsSource="{Binding InputList, Mode=OneWay}" SelectionMode="Multiple">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Title}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+        <Button x:Name="saveBtn" Content="Выбрать" Click="saveBtn_Click"/>
+    </StackPanel>
+
+</Window>
