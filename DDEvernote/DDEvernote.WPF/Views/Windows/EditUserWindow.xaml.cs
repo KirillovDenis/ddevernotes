@@ -35,15 +35,11 @@ namespace DDEvernote.WPF.Views.Windows
         {
             if (((ModelEditUserWindow)this.DataContext).SaveEdit(userName.Text, userPassword.Password))
             {
-                if (errMessage.Visibility == Visibility.Visible)
-                {
-                    errMessage.Visibility = Visibility.Collapsed;
-                }
                 this.Close();
             }
             else
             {
-                errMessage.Visibility = Visibility.Visible;
+                MessageBox.Show("Такое имя уже занято", "Ошибка редактирования", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

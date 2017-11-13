@@ -25,3 +25,4 @@
 2017-11-13 01:29:52.9364|ERROR|DDEvernote.Logger.Log|При обработке заметки с id: fb4ec955-2e5f-46da-a7fb-0d6b76c1732a произошла ошибка: Заметки с id: "fb4ec955-2e5f-46da-a7fb-0d6b76c1732a" не существует
 2017-11-13 01:56:00.7206|ERROR|DDEvernote.Logger.Log|Ошибка валидации
 2017-11-13 02:17:05.0625|ERROR|DDEvernote.Logger.Log|Ошибка валидации
+2017-11-13 12:57:16.8911|ERROR|DDEvernote.Logger.Log|При запросе пользователя произошла ошибка: {1}

@@ -4,8 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:DDEvernote.WPF"
-      mc:Ignorable="d" 
-      d:DesignHeight="300" d:DesignWidth="300"
+      mc:Ignorable="d"
       Title="MainPage">
 
     <TabControl>
@@ -24,8 +23,8 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <GridSplitter Grid.Row="1" Grid.Column="1" ShowsPreview="False" Width="3"
-                                HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+                    <!--<GridSplitter Grid.Row="1" Grid.Column="1" ShowsPreview="False" Width="3" IsEnabled="False"
+                                HorizontalAlignment="Center" VerticalAlignment="Stretch" />-->
                     <Button x:Name="createNoteBtn" Grid.Row="0" Grid.Column="0" FontSize="16"
                             Click="createNoteBtn_Click" Height="30" Width="auto" Content="Создать заметку"/>
                     <ListView x:Name="noteList" Grid.Row="1" Grid.Column="0" 
@@ -170,15 +169,13 @@
                     </Grid.ColumnDefinitions>
                     <GridSplitter Grid.Row="1" Grid.Column="1" ShowsPreview="False" Width="3"
                                 HorizontalAlignment="Center" VerticalAlignment="Stretch" IsEnabled="False" />
-                    <StackPanel Grid.Row="0" Grid.ColumnSpan="3" Orientation="Horizontal">
-                        <TextBlock Text="Вы: " FontSize="16" FontWeight="Bold"/>
-                        <TextBlock x:Name="currentUser" FontSize="16" Text="{Binding User.Name, Mode=OneWay}"/>
-
+                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                        <!--<TextBlock Text="Вы: " FontSize="16" FontWeight="Bold"/>
+                        <TextBlock x:Name="currentUser" FontSize="16" Text="{Binding User.Name, Mode=OneWay}"/>-->
                         <Button x:Name="editUserBtn" Content="Редактировать" Click="editUserBtn_Click" 
-                                FontSize="16" Margin="10,0,0,0" Height="30"/>
-                        <Button x:Name="logOutBtn" Content="Выйти" Click="logOutBtn_Click" 
-                                FontSize="16" Height="30"/>
-
+                                FontSize="16"  Height="30" HorizontalAlignment="Stretch" Width="125"/>
+                        <Button x:Name="logOutBtn" Content="Выйти" HorizontalAlignment="Stretch" Click="logOutBtn_Click" 
+                                FontSize="16" Height="30" Width="112"/>
                     </StackPanel>
                     <ListView x:Name="users" Grid.Row="1" Grid.Column="0" 
                               ItemsSource="{Binding Users, Mode=OneWay}"

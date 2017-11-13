@@ -511,6 +511,7 @@ namespace DDEvernote.WPF.ViewModels
             var noteWin = new NoteWindow(note);
             noteWin.Closed += (object o, EventArgs args) =>
               {
+                  SelectedNote = _client.GetNote(SelectedNote.Id);
                   if (noteWin.IsDeleted)
                   {
                       UserNotes.Remove(UserNotes.Where(n => n.Id == note.Id).Single());

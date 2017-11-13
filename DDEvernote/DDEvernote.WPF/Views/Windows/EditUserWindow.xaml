@@ -5,20 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DDEvernote.WPF.Views.Windows"
         mc:Ignorable="d"
-        Title="EditUserWindow" Height="300" Width="300">
-    <StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <TextBlock Text="Имя: "/>
-            <TextBox x:Name="userName" Text="{Binding EditableUser.Name, Mode=OneWay}" Height="20" Width="100"/>
-            <TextBlock x:Name="errMessage" Visibility="Collapsed" Text="Такое имя уже занято"/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <TextBlock Text="Пароль: "/>
-            <PasswordBox x:Name="userPassword" Height="20" Width="100"/>            
-        </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <Button x:Name="saveChangedBtn" Content="Сохранить изменения" Click="saveChangedBtn_Click"/>
-            <Button x:Name="cancelChangedBtn" Content="Отмена" Click="cancelChangedBtn_Click"/>
-        </StackPanel>
+        Title="Пользователь" Height="250" Width="300" ResizeMode="NoResize">
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Stretch">
+        <TextBlock Text="Имя: " FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+        <TextBox x:Name="userName" Text="{Binding EditableUser.Name, Mode=OneWay}" FontSize="16" />
+        <TextBlock Text="Пароль: " FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+        <PasswordBox x:Name="userPassword" FontSize="16" />
+        <Button x:Name="saveChangedBtn" Content="Сохранить изменения" FontSize="16" Margin="0,5,0,5" 
+                Click="saveChangedBtn_Click"/>
+        <Button x:Name="cancelChangedBtn" Content="Отмена" FontSize="16" 
+                Click="cancelChangedBtn_Click"/>
     </StackPanel>
 </Window>
