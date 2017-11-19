@@ -1,4 +1,5 @@
 ﻿using DDEvernote.Model;
+using DDEvernote.WPF.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,47 +22,12 @@ namespace DDEvernote.WPF.Views.Windows
     /// <summary>
     /// Interaction logic for PickItemsDialogWindow.xaml
     /// </summary>
-    public partial class PickItemsDialogWindow : Window, INotifyPropertyChanged
+    public partial class PickItemsDialogWindow : Window
     {
-        private ObservableCollection<GeneralType> _inputList;
-        public ObservableCollection<GeneralType> InputList
-        {
-            get { return _inputList; }
-            set
-            {
-                _inputList = value;
-                OnPropertyChanged("InputList");
-            }
-        }
-        private IEnumerable<GeneralType> _selectedItems;
-        public IEnumerable<GeneralType> SelectedItems
-        {
-            get { return _selectedItems; }
-        }
-        
-
         public PickItemsDialogWindow(IEnumerable<GeneralType> inList)
         {
             InitializeComponent();
-            DataContext = this;
-            InputList = new ObservableCollection<GeneralType>(inList);
-        }
-
-        private void saveBtn_Click(object sender, RoutedEventArgs e)
-        {
-            var tmpList = new List<GeneralType>();
-            foreach (var item in list.SelectedItems)
-            {
-                tmpList.Add((GeneralType)item);
-            }
-            _selectedItems = tmpList;
-            this.Close();
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged([CallerMemberName]string prop = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+            DataContext = new ModelPickItems(inList);
         }
     }
 }

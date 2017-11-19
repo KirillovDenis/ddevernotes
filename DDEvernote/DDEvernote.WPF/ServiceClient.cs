@@ -32,6 +32,11 @@ namespace DDEvernote.WPF
             return _client.PutAsJsonAsync("users", user).Result.Content.ReadAsAsync<User>().Result;
         }
 
+        public void DeleteUser(Guid userId)
+        {
+            _client.DeleteAsync($"users/{userId}");
+        }
+
         public bool IsExistUserByName(string userName)
         {
             var tmp = _client.GetAsync($"users/name/{userName}").Result.Content.ReadAsAsync<User>().Result;
@@ -88,6 +93,11 @@ namespace DDEvernote.WPF
         public Category CreateCategory(Guid userId, String categoryTitle)
         {
             return _client.PostAsJsonAsync($"users/{userId}/categories", new Category { Title = categoryTitle }).Result.Content.ReadAsAsync<Category>().Result;
+        }
+
+        public Category UpdateCategory(Category category)
+        {
+            return _client.PutAsJsonAsync("categories", category).Result.Content.ReadAsAsync<Category>().Result;
         }
 
         public IEnumerable<Category> GetCategoriesByUser(Guid userId)

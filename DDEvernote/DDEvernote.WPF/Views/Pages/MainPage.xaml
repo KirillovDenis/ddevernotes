@@ -3,9 +3,11 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
       xmlns:local="clr-namespace:DDEvernote.WPF"
       mc:Ignorable="d"
-      Title="MainPage">
+      x:Name="thisPage"
+      Title="MainPage" Height="400" Width="500">
 
     <TabControl>
         <TabItem x:Name="notesTab">
@@ -19,31 +21,47 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="2*"/>
                     </Grid.ColumnDefinitions>
-                    <!--<GridSplitter Grid.Row="1" Grid.Column="1" ShowsPreview="False" Width="3" IsEnabled="False"
-                                HorizontalAlignment="Center" VerticalAlignment="Stretch" />-->
-                    <Button x:Name="createNoteBtn" Grid.Row="0" Grid.Column="0" FontSize="16"
-                            Click="createNoteBtn_Click" Height="30" Width="auto" Content="Создать заметку"/>
-                    <ListView x:Name="noteList" Grid.Row="1" Grid.Column="0" 
-                              ItemsSource="{Binding UserNotes, Mode=OneWay}" 
-                              MouseDoubleClick="noteList_MouseDoubleClick"
-                              SelectionChanged="noteList_SelectionChanged">
+                    <Button x:Name="createNoteBtn" Grid.Row="0" Grid.Column="0" FontSize="16" 
+                                HorizontalAlignment="Stretch"
+                            Command="{Binding CreateNoteCommand}" Height="30"  Content="Создать заметку"/>
+                        <Button x:Name="updateNotesBtn" Grid.Row="0" Grid.Column="1" FontSize="16" 
+                                HorizontalAlignment="Stretch"
+                            Command="{Binding UpdNotesCommand}" Height="30"  Content="Обновить"/>
+                    <ListView x:Name="noteList" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                              ItemsSource="{Binding UserNotes, Mode=OneWay}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding SelectNoteCommand}" 
+                                                       CommandParameter="{Binding ElementName=noteList, Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="MouseDoubleClick">
+                                <i:InvokeCommandAction Command="{Binding EditNoteCommand}" 
+                                                       CommandParameter="{Binding ElementName=noteList, Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <ListView.Resources>
+                            <local:BindingProxy x:Key="proxy" Data="{Binding}"/>
+                        </ListView.Resources>
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel x:Name="noteItem"
                                             HorizontalAlignment="Stretch">
                                     <StackPanel.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem x:Name="shareNoteCtxMenu" Header="Поделиться" 
-                                                      Click="shareNoteCtxMenu_Click"/>
+                                            <MenuItem x:Name="shareNoteCtxMenu" Header="Поделиться"
+                                                        Command="{Binding Source={StaticResource proxy}, 
+                                                                            Path=Data.ShareNoteCommand}"/>
                                             <MenuItem x:Name="addCategoryToNoteCtxMenu" Header="Добавить категорию" 
-                                                      Click="addCategoryToNoteCtxMenu_Click"/>
+                                                      Command="{Binding Source={StaticResource proxy}, 
+                                                                            Path=Data.AddCategoriesToNoteCommand}"/>
                                             <MenuItem x:Name="delNoteCtxMenu" Header="Удалить" 
-                                                      Click="delNoteCtxMenu_Click"
-                                                      StaysOpenOnClick="False"/>
+                                                      Command="{Binding Source={StaticResource proxy}, 
+                                                                            Path=Data.DeleteNoteCommand}"/>
                                         </ContextMenu>
                                     </StackPanel.ContextMenu>
                                     <TextBlock Text="{Binding Title}" Padding="3,0,0,0" FontSize="16" FontStyle="Italic"/>
@@ -51,9 +69,9 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Свойства заметки: " FontSize="16" FontWeight="Bold" 
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text="Свойства заметки: " FontSize="16" FontWeight="Bold" 
                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <StackPanel x:Name="noteProperty" Grid.Row="1" Grid.Column="2" VerticalAlignment="Stretch" 
+                    <StackPanel x:Name="noteProperty" Grid.Row="1" Grid.Column="3" VerticalAlignment="Stretch" 
                                 HorizontalAlignment="Center"
                                 Visibility="{Binding VisibilityPropertyOfNote}" >
                         <TextBlock x:Name="noteTitleProp" 
@@ -105,12 +123,26 @@
                     <GridSplitter Grid.Row="1" Grid.Column="1" ShowsPreview="False" Width="3" IsEnabled="False"
                                 HorizontalAlignment="Center" VerticalAlignment="Stretch" />
                     <Button x:Name="createCategoryBtn" Grid.Row="0" Grid.Column="0" 
-                            Click="createCategoryBtn_Click" 
+                                Command="{Binding CreateCategoryCommand}"
                                 FontSize="16" Content="Создать категорию"
                                 Height="30" Width="auto"/>
                     <ListView x:Name="categoryList" Grid.Row="1" Grid.Column="0" 
-                              ItemsSource="{Binding UserCategories, Mode=OneWay}"
-                              SelectionChanged="categoryList_SelectionChanged">
+                              ItemsSource="{Binding UserCategories, Mode=OneWay}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding SelectCategoryCommand}" 
+                                                       CommandParameter="{Binding ElementName=categoryList, 
+                                                                                         Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="MouseDoubleClick">
+                                <i:InvokeCommandAction Command="{Binding EditCategoryCommand}" 
+                                                       CommandParameter="{Binding ElementName=categoryList, 
+                                                                                         Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <ListView.Resources>
+                            <local:BindingProxy x:Key="cproxy" Data="{Binding}"/>
+                        </ListView.Resources>
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel x:Name="categoryItem" 
@@ -118,9 +150,11 @@
                                     <StackPanel.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem x:Name="addNoteInCategory" Header="Добавить к заметке"
-                                                      Click="addNoteInCategory_Click"/>
+                                                      Command="{Binding Source={StaticResource cproxy}, 
+                                                                            Path=Data.AddNotesToCategoryCommand}"/>
                                             <MenuItem x:Name="delCategoryCtxMenu" Header="Удалить" 
-                                                      Click="delCategoryCtxMenu_Click"/>
+                                                      Command="{Binding Source={StaticResource cproxy}, 
+                                                                            Path=Data.DeleteCategoryCommand}"/>
                                         </ContextMenu>
                                     </StackPanel.ContextMenu>
                                     <TextBlock Text="{Binding Title}" Padding="3,0,0,0" FontSize="16" FontStyle="Italic"/>
@@ -132,16 +166,27 @@
                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <ListView x:Name="notesOfCategoryList" Grid.Row="1" Grid.Column="2" 
                               ItemsSource="{Binding NotesOfSelectedCategory, Mode=OneWay}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding SelectNoteCommand}" 
+                                                       CommandParameter="{Binding ElementName=notesOfCategoryList, 
+                                                                                         Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <ListView.Resources>
+                            <local:BindingProxy x:Key="ncproxy" Data="{Binding}"/>
+                        </ListView.Resources>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel x:Name="noteOfcategoryItem"
-                                            HorizontalAlignment="Stretch">
+                                <StackPanel x:Name="noteOfcategoryItem" HorizontalAlignment="Stretch">
                                     <StackPanel.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem x:Name="shareNoteCtxMenu" Header="Поделиться" 
-                                                      Click="shareNoteCtxMenu_Click"/>
+                                                      Command="{Binding Source={StaticResource ncproxy}, 
+                                                                            Path=Data.ShareNoteCommand}"/>
                                             <MenuItem x:Name="delNoteCtxMenu" Header="Удалить" 
-                                                      Click="delNoteCtxMenu_Click"/>
+                                                      Command="{Binding Source={StaticResource ncproxy}, 
+                                                                            Path=Data.DeleteNoteCommand}"/>
                                         </ContextMenu>
                                     </StackPanel.ContextMenu>
                                     <TextBlock Text="{Binding Title}" Padding="3,0,0,0" FontSize="16" FontStyle="Italic"/>
@@ -160,33 +205,54 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="2*" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <GridSplitter Grid.Row="1" Grid.Column="1" ShowsPreview="False" Width="3"
+                    <GridSplitter Grid.Row="2" Grid.Column="1" ShowsPreview="False" Width="2"
                                 HorizontalAlignment="Center" VerticalAlignment="Stretch" IsEnabled="False" />
-                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Stretch">
-                        <!--<TextBlock Text="Вы: " FontSize="16" FontWeight="Bold"/>
-                        <TextBlock x:Name="currentUser" FontSize="16" Text="{Binding User.Name, Mode=OneWay}"/>-->
-                        <Button x:Name="editUserBtn" Content="Редактировать" Click="editUserBtn_Click" 
-                                FontSize="16"  Height="30" HorizontalAlignment="Stretch" Width="125"/>
-                        <Button x:Name="logOutBtn" Content="Выйти" HorizontalAlignment="Stretch" Click="logOutBtn_Click" 
-                                FontSize="16" Height="30" Width="112"/>
+                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" 
+                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock  VerticalAlignment="Center"
+                                   Text="Вы: " FontSize="16" FontWeight="Bold"/>
+                        <TextBlock x:Name="currentUser"  
+                                   FontSize="16" Text="{Binding User.Name, Mode=OneWay}"/>
                     </StackPanel>
-                    <ListView x:Name="users" Grid.Row="1" Grid.Column="0" 
-                              ItemsSource="{Binding Users, Mode=OneWay}"
-                              SelectionChanged="users_SelectionChanged">
+                    <Button x:Name="editUserBtn" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" 
+                                Content="Редактировать" Command="{Binding EditUserCommand}" 
+                                                        CommandParameter="{Binding ElementName=thisPage}"
+                                FontSize="16"  Height="30"/>
+                    <Button x:Name="logOutBtn" Grid.Row="0" Grid.Column="3" HorizontalAlignment="Stretch" 
+                                Content="Выйти" 
+                                Command="{Binding LogOutCommand}" CommandParameter="{Binding ElementName=thisPage}"
+                                FontSize="16" Height="30" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Пользователи: " FontSize="16" FontWeight="Bold" 
+                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <ListView x:Name="usersList" Grid.Row="2" Grid.Column="0" 
+                              ItemsSource="{Binding Users, Mode=OneWay}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding SelectUserCommand}" 
+                                                       CommandParameter="{Binding ElementName=usersList, Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <ListView.Resources>
+                            <local:BindingProxy x:Key="uproxy" Data="{Binding}"/>
+                        </ListView.Resources>
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel>
                                     <StackPanel.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem x:Name="usersShareNoteCtxMenu" Header="Поделиться" 
-                                                      Click="usersShareNoteCtxMenu_Click"/>
+                                                        Command="{Binding Source={StaticResource uproxy}, 
+                                                                            Path=Data.AddSharedNotesToUserCommand}"/>
                                         </ContextMenu>
                                     </StackPanel.ContextMenu>
                                     <TextBlock Text="{Binding Name}" Padding="3,0,0,0" FontSize="16" FontStyle="Italic"/>
@@ -194,17 +260,29 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Общие заметки: " FontSize="16" FontWeight="Bold" 
-                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <ListView x:Name="users2" Grid.Row="1" Grid.Column="2"
+                    <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" 
+                                Text="Общие заметки: " FontSize="16" FontWeight="Bold" 
+                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <ListView x:Name="sharedNotesOfUser" Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2"
                               ItemsSource="{Binding NotesOfSelectedUser, Mode=OneWay}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding SelectNoteCommand}" 
+                                                       CommandParameter="{Binding ElementName=sharedNotesOfUser, 
+                                                                                         Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <ListView.Resources>
+                            <local:BindingProxy x:Key="nproxy" Data="{Binding}"/>
+                        </ListView.Resources>
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel x:Name="noteOfUserItem" >
                                     <StackPanel.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem x:Name="denyShare" Header="Перестать делиться" 
-                                                      Click="denyShare_Click"/>
+                                                        Command="{Binding Source={StaticResource nproxy}, 
+                                                                            Path=Data.DenySharedNotesToUserCommand}"/>
                                         </ContextMenu>
                                     </StackPanel.ContextMenu>
                                     <TextBlock Text="{Binding Title}" Padding="3,0,0,0" FontSize="16" FontStyle="Italic"/>

@@ -7,38 +7,58 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using DDEvernote.Model;
+using System.Windows.Input;
+using System.Windows.Controls;
+using DDEvernote.WPF.Views.Windows;
 
 namespace DDEvernote.WPF.ViewModels
 {
     public class ModelLoginPage : INotifyPropertyChanged
     {
         private ServiceClient _client;
+        public string UserName { get; set; }
+
+        private Command _logInCommand;
+        public Command LogInCommand
+        {
+            get { return _logInCommand; }
+        }
+        private Command _signUpCommand;
+        public Command SignUpCommand
+        {
+            get { return _signUpCommand; }
+        }
 
         public ModelLoginPage()
         {
             _client = new ServiceClient("http://localhost:52395/api/");
+            _logInCommand = new Command(passwordBox => { LogIn((PasswordBox)passwordBox); });
+            _signUpCommand = new Command(passwordBox => { SignUp((PasswordBox)passwordBox); });
+        }
+        public void LogIn(PasswordBox passwordBox)
+        {
+            var existedUser = _client.GetUserByName(UserName);
+            if (passwordBox.Password == existedUser.Password)
+            {
+                ((MainWindow)((Page)((Grid)((StackPanel)passwordBox.Parent).Parent).Parent).Parent).Content = new MainPage(existedUser);
+            }
+            else
+            {
+                MessageBox.Show("Неверное имя или пароль", "Ошибка входа", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        public User LogIn(string name, string password)
+        private void SignUp(PasswordBox passwordBox)
         {
-            var existedUser = _client.GetUserByName(name);
-            if (password == existedUser.Password)
+            if (!_client.IsExistUserByName(UserName))
             {
-                return existedUser;
+                var createdUser = _client.CreateUser(new User { Name = UserName, Password = passwordBox.Password });
+                ((MainWindow)((Page)((Grid)((StackPanel)passwordBox.Parent).Parent).Parent).Parent).Content = new MainPage(createdUser);
             }
-            MessageBox.Show("Неверное имя или пароль", "Ошибка входа", MessageBoxButton.OK, MessageBoxImage.Error);
-            return null;
-        }
-
-        public User SingUp(string name, string password)
-        {
-            if (!_client.IsExistUserByName(name))
+            else
             {
-                var createdUser = _client.CreateUser(new User { Name = name, Password = password });
-                return createdUser;
+                MessageBox.Show("Пользователь с таким именем уже существует", "Ошибка регистрации", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            MessageBox.Show("Пользователь с таким именем уже существует", "Ошибка регистрации", MessageBoxButton.OK, MessageBoxImage.Error);
-            return null;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

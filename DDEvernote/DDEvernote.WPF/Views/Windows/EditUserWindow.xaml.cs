@@ -29,23 +29,5 @@ namespace DDEvernote.WPF.Views.Windows
             InitializeComponent();
             this.DataContext = new ModelEditUserWindow(ref user);
         }
-
-
-        private void saveChangedBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (((ModelEditUserWindow)this.DataContext).SaveEdit(userName.Text, userPassword.Password))
-            {
-                this.Close();
-            }
-            else
-            {
-                MessageBox.Show("Такое имя уже занято", "Ошибка редактирования", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void cancelChangedBtn_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
     }
 }

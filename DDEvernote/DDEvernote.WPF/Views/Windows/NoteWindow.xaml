@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DDEvernote.WPF.Views.Windows"
         mc:Ignorable="d"
+        x:Name="thisWindow"
         Title="Заметка" Height="300" Width="300" ResizeMode="NoResize">
 
     <Grid>
@@ -23,17 +23,17 @@
                      Text="{Binding Note.Title, Mode=TwoWay}" Width="190" 
                      HorizontalAlignment="Stretch" FontSize="16"/>
         </StackPanel>
-
         <TextBox x:Name="textNote" Grid.Row="1" Grid.ColumnSpan="3" 
                  Text="{Binding Note.Text, Mode=TwoWay}" 
                  TextWrapping="Wrap"
                  AcceptsReturn="True"
                  FontSize="15"/>
-
         <Button x:Name="saveNoteBtn" Grid.Row="2" Grid.Column="0" Content="Сохранить" FontSize="16"
-                Click="saveNoteBtn_Click" Margin="3,3,3,3"/>
+                Command="{Binding SaveNoteCommand}" CommandParameter="{Binding ElementName=thisWindow}" 
+                Margin="3,3,3,3"/>
         <Button x:Name="deleteNoteBtn" Grid.Row="2" Grid.Column="2" Content="Удалить" FontSize="16"
-                Click="deleteNoteBtn_Click" Margin="3,3,3,3"/>
+                Command="{Binding DeleteNoteCommand}" CommandParameter="{Binding ElementName=thisWindow}"
+                Margin="3,3,3,3"/>
     </Grid>
 
 </Window>

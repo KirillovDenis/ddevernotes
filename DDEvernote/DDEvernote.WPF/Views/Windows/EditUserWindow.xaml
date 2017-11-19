@@ -3,17 +3,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DDEvernote.WPF.Views.Windows"
         mc:Ignorable="d"
+        x:Name="thisWindow"
         Title="Пользователь" Height="250" Width="300" ResizeMode="NoResize">
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Stretch">
         <TextBlock Text="Имя: " FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
-        <TextBox x:Name="userName" Text="{Binding EditableUser.Name, Mode=OneWay}" FontSize="16" />
+        <TextBox x:Name="userName" Text="{Binding User.Name, Mode=TwoWay}" FontSize="16" />
         <TextBlock Text="Пароль: " FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
         <PasswordBox x:Name="userPassword" FontSize="16" />
         <Button x:Name="saveChangedBtn" Content="Сохранить изменения" FontSize="16" Margin="0,5,0,5" 
-                Click="saveChangedBtn_Click"/>
-        <Button x:Name="cancelChangedBtn" Content="Отмена" FontSize="16" 
-                Click="cancelChangedBtn_Click"/>
+                Command="{Binding SaveUserCommand}"
+                CommandParameter="{Binding ElementName=userPassword}"/>
+        <Button x:Name="deleteUserBtn" Content="Удалить пользователя" FontSize="16" 
+                Command="{Binding DeleteUserCommand}"
+                CommandParameter="{Binding ElementName=thisWindow}"/>
     </StackPanel>
 </Window>

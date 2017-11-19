@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using DDEvernote.Model;
+﻿using DDEvernote.Model;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using DDEvernote.WPF.Views.Windows;
-
+using System.Windows.Controls;
 
 namespace DDEvernote.WPF.ViewModels
 {
@@ -15,48 +11,88 @@ namespace DDEvernote.WPF.ViewModels
     {
         private readonly ServiceClient _client;
         private User _user;
-        public User EditableUser
+        public User User { get; set; }
+        public bool IsDeleted { get; set; }
+
+        #region Commands
+
+        private Command saveUserCommand;
+        public Command SaveUserCommand
         {
-            get { return _user; }
+            get { return saveUserCommand; }
             set
             {
-                _user = value;
-                OnPropertyChanged("EditableUser");
+                saveUserCommand = value;
+                OnPropertyChanged("SaveUserCommand");
             }
         }
+        private Command deleteUserCommand;
+        public Command DeleteUserCommand
+        {
+            get { return deleteUserCommand; }
+            set
+            {
+                deleteUserCommand = value;
+                OnPropertyChanged("DeleteUserCommand");
+            }
+        }
+
+        #endregion
 
         public ModelEditUserWindow(ref User user)
         {
-            _user = user;
             _client = new ServiceClient("http://localhost:52395/api/");
+            _user = user;
+            User = new User();
+            User.Name = _user.Name;
+            IsDeleted = false;
+
+            SaveUserCommand = new Command((passBox) => { SaveEdit((PasswordBox)passBox); });
+            DeleteUserCommand = new Command((editUserWindow) => { DeleteUser((EditUserWindow)editUserWindow); });
         }
 
-        public bool SaveEdit(String newName, String newPassword)
+        private void SaveEdit(PasswordBox passBox)
         {
+            string password = passBox.Password;
             bool IsNameExist = false;
-            if (newName != _user.Name && newName!=string.Empty)
+            if (User.Name != _user.Name && User.Name != string.Empty)
             {
-                if (_client.IsExistUserByName(newName))
+                if (_client.IsExistUserByName(User.Name))
                 {
                     IsNameExist = true;
                 }
-                _user.Name = newName;
+                _user.Name = User.Name;
             }
-            if (newPassword != string.Empty && newPassword != _user.Password)
+            if (password != string.Empty && password != _user.Password)
             {
-                _user.Password = newPassword;
+                _user.Password = password;
             }
             if (!IsNameExist)
             {
                 _client.UpdateUser(_user);
-                return true;
+                ((EditUserWindow)((StackPanel)passBox.Parent).Parent).Close();
             }
-            return false;
+            else
+            {
+                MessageBox.Show("Такое имя уже занято", "Ошибка редактирования", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        private void DeleteUser(Window window)
+        {
+            if (MessageBox.Show("Вы действительно хотите удалить пользователя?", 
+                                "Подтвержение удаления", 
+                                MessageBoxButton.YesNo, 
+                                MessageBoxImage.Question, 
+                                MessageBoxResult.No) == MessageBoxResult.Yes)
+            {
+                _client.DeleteUser(_user.Id);
+                IsDeleted = true;
+                window.Close();
+            }
         }
 
-
         public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged([CallerMemberName]string prop = "")
+        private void OnPropertyChanged([CallerMemberName]string prop = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }

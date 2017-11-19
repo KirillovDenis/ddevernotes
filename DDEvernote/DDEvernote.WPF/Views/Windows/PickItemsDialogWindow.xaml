@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DDEvernote.WPF.Views.Windows"
         mc:Ignorable="d"
+        x:Name="thisWindow"
         Title="Окно выбора" Height="300" Width="300" ResizeMode="NoResize">
 
     <StackPanel>
@@ -16,11 +17,13 @@
             </ListView.ItemTemplate>
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
-                    <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>
-        <Button x:Name="saveBtn" Content="Выбрать" Click="saveBtn_Click" Margin="5,5,5,5" FontSize="16"/>
+        <Button x:Name="saveBtn" Content="Выбрать" 
+                Command="{Binding SaveCommand}" CommandParameter="{Binding ElementName=thisWindow}" 
+                Margin="5,5,5,5" FontSize="16"/>
     </StackPanel>
 
 </Window>

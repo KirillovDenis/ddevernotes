@@ -23,30 +23,10 @@ namespace DDEvernote.WPF.Views.Pages
     /// </summary>
     public partial class LoginPage : Page
     {
-        
         public LoginPage()
         {
             InitializeComponent();
             DataContext = new ModelLoginPage();
-        }
-
-
-        private void signInBtn_Click(object sender, RoutedEventArgs e)
-        {
-            User existedUser = ((ModelLoginPage)this.DataContext).LogIn(loginName.Text, loginPassword.Password);
-            if (existedUser!=null)
-            {
-                ((MainWindow)this.Parent).Content = new MainPage(existedUser);
-            }
-        }
-
-        private void signUpBtn_Click(object sender, RoutedEventArgs e)
-        {
-            User createdUser = ((ModelLoginPage)this.DataContext).SingUp(loginName.Text, loginPassword.Password);
-            if (createdUser != null)
-            {
-                ((MainWindow)this.Parent).Content = new MainPage(createdUser);
-            }
         }
     }
 }
