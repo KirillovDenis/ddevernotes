@@ -5,6 +5,7 @@ using DDEvernote.Model;
 using DDEvernote.DataLayer;
 using DDEvernote.DataLayer.Sql;
 using DDEvernote.Api.Filters;
+using System.Web.Configuration;
 
 namespace DDEvernote.Api.Controllers
 {
@@ -13,7 +14,7 @@ namespace DDEvernote.Api.Controllers
     /// </summary>
     public class CategoriesController : ApiController
     {
-        private const string _connectionString = @"Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;";
+        private readonly string _connectionString = WebConfigurationManager.ConnectionStrings["DBConnectionString"].ConnectionString;
         private readonly ICategoriesRepository _categoriesRepository;
         private readonly NLog.Logger _logger;
         

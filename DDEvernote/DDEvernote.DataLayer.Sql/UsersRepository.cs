@@ -246,5 +246,73 @@ namespace DDEvernote.DataLayer.Sql
                 }
             }
         }
+
+        public IEnumerable<Guid> GetUsersForNotify(Guid userId)
+        {
+            _logger.Debug("Начато получение id пользователей для уведомления. Изменения от пользователя с id: \"{0}\"", userId);
+            ICategoriesRepository _categoriesRepository = new CategoriesRepository(_connectionString);
+            INotesRepository notesRepository = new NotesRepository(_connectionString);
+            if (!notesRepository.IsExist(userId))
+            {
+                throw new UserNotFoundException($"Пользователя с id: \"{userId}\" не существует", userId);
+            }
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            {
+                sqlConnection.Open();
+                using (var command = sqlConnection.CreateCommand())
+                {
+                    _logger.Debug("Запрос к базе данных на получение id пользователей для их уведомления. Изменения от пользователя с id: \"{0}\"", userId);
+                    command.CommandText = "select shared.user_id " +
+                        "from notes inner join shared " +
+                        "on notes.id=shared.note_id " +
+                        "where notes.user_id = @userId";
+                    command.Parameters.AddWithValue("@userId", userId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        var listOfUsers = new List<Guid>();
+                        while (reader.Read())
+                        {
+                            listOfUsers.Add(new Guid(reader.GetString(reader.GetOrdinal("user_id"))));
+                        }
+                        _logger.Info("Получено \"{0}\" id пользователей для уведомления. Изменения от пользователя с id: \"{1}\"", listOfUsers.Count(), userId);
+                        return listOfUsers;
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<Guid> GetUsersForNotifyByNote(Guid noteId)
+        {
+            _logger.Debug("Начато получение id пользователей для уведомления. Изменения заметки с id: \"{0}\"", noteId);
+            ICategoriesRepository _categoriesRepository = new CategoriesRepository(_connectionString);
+            INotesRepository notesRepository = new NotesRepository(_connectionString);
+            if (!notesRepository.IsExist(noteId))
+            {
+                throw new NoteNotFoundException($"Заметки с id: \"{noteId}\" не существует", noteId);
+            }
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            {
+                sqlConnection.Open();
+                using (var command = sqlConnection.CreateCommand())
+                {
+                    _logger.Debug("Запрос к базе данных на получение id пользователей для уведомления. Изменена заметка с id: \"{0}\"", noteId);
+                    command.CommandText = "select shared.user_id " +
+                        "from notes inner join shared " +
+                        "on notes.id=shared.note_id " +
+                        "where notes.id = @noteId";
+                    command.Parameters.AddWithValue("@noteId", noteId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        var listOfUsers = new List<Guid>();
+                        while (reader.Read())
+                        {
+                            listOfUsers.Add(new Guid(reader.GetString(reader.GetOrdinal("user_id"))));
+                        }
+                        _logger.Info("Получено \"{0}\" id пользователей для уведомления. Изменена заметка с id: \"{1}\"", listOfUsers.Count(), noteId);
+                        return listOfUsers;
+                    }
+                }
+            }
+        }
     }
 }

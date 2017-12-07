@@ -456,5 +456,38 @@ namespace DDEvernote.DataLayer.Sql
                 }
             }
         }
+
+        public IEnumerable<Guid> GetUserNotify(Guid noteId)
+        {
+            _logger.Debug("Начато обновление заметки с id: \"{0}\"", noteId);
+            if (!IsExist(noteId))
+            {
+                throw new NoteNotFoundException($"Заметки с id: \"{noteId}\" не существует", noteId);
+            }
+            using (var sqlConnection = new SqlConnection(_connectionString))
+            {
+                sqlConnection.Open();
+                using (var command = sqlConnection.CreateCommand())
+                {
+                    _logger.Debug("Запрос к базе данных на обновление заметки с id: \"{0}\"", noteId);
+                    command.CommandText = "select shared.user_id " +
+                        "from notes inner join shared " +
+                        "on notes.id=shared.note_id " +
+                        "where notes.id = @noteId";
+                    command.Parameters.AddWithValue("@noteId", noteId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        var listOfUsers = new List<Guid>();
+                        while (reader.Read())
+                        {
+                            listOfUsers.Add(new Guid(reader.GetString(reader.GetOrdinal("id"))));
+                        }
+                        listOfUsers.Add(Get(noteId).Owner.Id);
+                        return listOfUsers;
+                    }
+                    };
+
+            }
+        }
     }
 }

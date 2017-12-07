@@ -5,6 +5,7 @@ using DDEvernote.DataLayer.Sql;
 using DDEvernote.DataLayer;
 using DDEvernote.Api.Filters;
 using System.Collections.Generic;
+using System.Web.Configuration;
 
 namespace DDEvernote.Api.Controllers
 {
@@ -13,7 +14,7 @@ namespace DDEvernote.Api.Controllers
     /// </summary>
     public class UsersController : ApiController
     {
-        private const string ConnectionString = @"Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;";
+        private readonly string ConnectionString = WebConfigurationManager.ConnectionStrings["DBConnectionString"].ConnectionString;
         private readonly IUsersRepository _usersRepository;
         private readonly NLog.Logger _logger;
 

@@ -4,6 +4,8 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System;
 using System.Linq;
+using System.Resources;
+using System.Reflection;
 
 namespace DDEvernote.WPF.ViewModels
 {
@@ -41,7 +43,10 @@ namespace DDEvernote.WPF.ViewModels
 
         public ModelCategoryWindow(User user, Category category)
         {
-            _client = new ServiceClient("http://localhost:52395/api/");
+            ResourceManager rm = new ResourceManager("DDEvernote.WPF.ConnectionResource",
+                            Assembly.GetExecutingAssembly());
+            string connectionString = rm.GetString("ConnectionString");
+            _client = new ServiceClient(connectionString);
             this.Category = category;
             _user = user;
             IsDeleted = false;

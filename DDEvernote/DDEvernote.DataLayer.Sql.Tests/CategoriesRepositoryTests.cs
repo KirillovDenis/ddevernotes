@@ -11,7 +11,7 @@ namespace DDEvernote.DataLayer.Sql.Tests
     {
         private const string ConnectionString = @"Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;";
         private readonly List<Guid> _tempUsers = new List<Guid>();
-        
+
         [TestMethod]
         public void ShouldCreateCategory()
         {
@@ -158,8 +158,8 @@ namespace DDEvernote.DataLayer.Sql.Tests
             category = categoriesRepository.Create(user.Id, category.Title);
             category2 = categoriesRepository.Create(user.Id, category2.Title);
             note = notesRepository.Create(note);
-            notesRepository.AddNoteInCategory(category.Id, note.Id);
-            notesRepository.AddNoteInCategory(category2.Id, note.Id);
+            notesRepository.AddNoteInCategory(note.Id, category.Id);
+            notesRepository.AddNoteInCategory(note.Id, category2.Id);
 
             IEnumerable<Category> createdCategories = categoriesRepository.GetCategoriesOfNote(note.Id);
 

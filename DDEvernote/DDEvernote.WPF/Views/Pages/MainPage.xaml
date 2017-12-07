@@ -8,7 +8,11 @@
       mc:Ignorable="d"
       x:Name="thisPage"
       Title="MainPage" Height="400" Width="500">
-
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding UnloadPageCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <TabControl>
         <TabItem x:Name="notesTab">
             <TabItem.Header>
@@ -33,7 +37,7 @@
                                 HorizontalAlignment="Stretch"
                             Command="{Binding UpdNotesCommand}" Height="30"  Content="Обновить"/>
                     <ListView x:Name="noteList" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                              ItemsSource="{Binding UserNotes, Mode=OneWay}">
+                              ItemsSource="{Binding UserNotes, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="SelectionChanged">
                                 <i:InvokeCommandAction Command="{Binding SelectNoteCommand}" 
@@ -64,7 +68,7 @@
                                                                             Path=Data.DeleteNoteCommand}"/>
                                         </ContextMenu>
                                     </StackPanel.ContextMenu>
-                                    <TextBlock Text="{Binding Title}" Padding="3,0,0,0" FontSize="16" FontStyle="Italic"/>
+                                    <TextBlock Text="{Binding Title, Mode=OneWay}" Padding="3,0,0,0" FontSize="16" FontStyle="Italic"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>

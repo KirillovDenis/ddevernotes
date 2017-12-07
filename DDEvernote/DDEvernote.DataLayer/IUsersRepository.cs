@@ -17,5 +17,7 @@ namespace DDEvernote.DataLayer
         bool IsExist(Guid userId);
         User Get(String userName);
         IEnumerable<User> GetUsers();
+        IEnumerable<Guid> GetUsersForNotify(Guid userId);
+        IEnumerable<Guid> GetUsersForNotifyByNote(Guid userId);
     }
 }

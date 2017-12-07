@@ -4,6 +4,8 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using DDEvernote.WPF.Views.Windows;
 using System.Windows.Controls;
+using System.Resources;
+using System.Reflection;
 
 namespace DDEvernote.WPF.ViewModels
 {
@@ -41,7 +43,10 @@ namespace DDEvernote.WPF.ViewModels
 
         public ModelEditUserWindow(ref User user)
         {
-            _client = new ServiceClient("http://localhost:52395/api/");
+            ResourceManager rm = new ResourceManager("DDEvernote.WPF.ConnectionResource",
+                               Assembly.GetExecutingAssembly());
+            string connectionString = rm.GetString("ConnectionString");
+            _client = new ServiceClient(connectionString);
             _user = user;
             User = new User();
             User.Name = _user.Name;

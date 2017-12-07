@@ -75,7 +75,7 @@ namespace DDEvernote.DataLayer.Sql.Tests
             note = notesRepo.Create(note);
             note2 = notesRepo.Create(note2);
             category = categoriesRepo.Create(user.Id, category.Title);
-            notesRepo.AddNoteInCategory(category.Id, note.Id);
+            notesRepo.AddNoteInCategory(note.Id, category.Id);
             IEnumerable<Note> createdNotes = notesRepo.GetUserNotes(user.Id);
 
             //assert
@@ -108,7 +108,7 @@ namespace DDEvernote.DataLayer.Sql.Tests
             _tempUsers.Add(user.Id);
             var createdCategory = categoriesRepo.Create(user.Id, categoryName);
             var createdNote = notesRepo.Create(note);
-            notesRepo.AddNoteInCategory(createdCategory.Id, createdNote.Id);
+            notesRepo.AddNoteInCategory(createdNote.Id, createdCategory.Id);
 
             var noteOfUser = notesRepo.GetNotesByCategory(createdCategory.Id);
 
@@ -175,7 +175,7 @@ namespace DDEvernote.DataLayer.Sql.Tests
             _tempUsers.Add(user.Id);
             note = notesRepo.Create(note);
             category = categoriesRepo.Create(user.Id, category.Title);
-            notesRepo.AddNoteInCategory(category.Id, note.Id);
+            notesRepo.AddNoteInCategory(note.Id, category.Id);
             var createdNotes = notesRepo.Get(note.Id);
 
             //assert

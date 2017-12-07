@@ -10,6 +10,11 @@ using DDEvernote.Model;
 using System.Windows.Input;
 using System.Windows.Controls;
 using DDEvernote.WPF.Views.Windows;
+using System.Net.WebSockets;
+using System.Threading;
+using System.Resources;
+using System.Reflection;
+using System.Globalization;
 
 namespace DDEvernote.WPF.ViewModels
 {
@@ -31,11 +36,14 @@ namespace DDEvernote.WPF.ViewModels
 
         public ModelLoginPage()
         {
-            _client = new ServiceClient("http://localhost:52395/api/");
+            ResourceManager rm = new ResourceManager("DDEvernote.WPF.ConnectionResource",
+                            Assembly.GetExecutingAssembly());
+            string connString = rm.GetString("ConnectionString");
+            _client = new ServiceClient(connString);
             _logInCommand = new Command(passwordBox => { LogIn((PasswordBox)passwordBox); });
             _signUpCommand = new Command(passwordBox => { SignUp((PasswordBox)passwordBox); });
         }
-        public void LogIn(PasswordBox passwordBox)
+        public async void LogIn(PasswordBox passwordBox)
         {
             var existedUser = _client.GetUserByName(UserName);
             if (passwordBox.Password == existedUser.Password)

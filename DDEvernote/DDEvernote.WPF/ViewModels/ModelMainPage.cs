@@ -8,11 +8,23 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using DDEvernote.WPF.Views.Windows;
 using DDEvernote.WPF.Views.Pages;
+using System.Resources;
+using System.Reflection;
+using System.Net.WebSockets;
+using System.Text;
+using Microsoft.AspNet.SignalR.Client;
+using System.Threading;
+using System.Net.Http;
+using Microsoft.AspNet.SignalR.Json;
 
 namespace DDEvernote.WPF.ViewModels
 {
     public class ModelMainPage : INotifyPropertyChanged
     {
+
+        private IHubProxy HubProxy { get; set; }
+        private HubConnection Connection { get; set; }
+        private ClientWebSocket _socket;
         private ServiceClient _client;
         private Visibility _visibilityPropertyOfNote;
         public Visibility VisibilityPropertyOfNote
@@ -298,20 +310,34 @@ namespace DDEvernote.WPF.ViewModels
                 OnPropertyChanged("DenySharedNotesToUserCommand");
             }
         }
+        private Command unloadPageCommand;
+        public Command UnloadPageCommand
+        {
+            get { return unloadPageCommand; }
+            set
+            {
+                unloadPageCommand = value;
+                OnPropertyChanged("UnloadPageCommand");
+            }
+        }
 
         #endregion
 
         public ModelMainPage(User user)
         {
             this.User = user;
-            _client = new ServiceClient("http://localhost:52395/api/");
+            ResourceManager rm = new ResourceManager("DDEvernote.WPF.ConnectionResource",
+                            Assembly.GetExecutingAssembly());
+            string connString = rm.GetString("ConnectionString");
+            _socket = new ClientWebSocket();
+            ConnectToHubAsync();
+            _client = new ServiceClient(connString);
             UserNotes = new ObservableCollection<Note>(getNotes(user.Id));
             UserCategories = new ObservableCollection<Category>(user.Categories);
             Users = new ObservableCollection<User>(GetUsers().Where(u => u.Id != _user.Id));
             NotesOfSelectedCategory = new ObservableCollection<Note>();
             NotesOfSelectedUser = new ObservableCollection<Note>();
             VisibilityPropertyOfNote = Visibility.Hidden;
-
             CreateNoteCommand = new Command(() => { CreateNote(); });
             CreateCategoryCommand = new Command(() => { CreateCategory(); });
             EditUserCommand = new Command((page) => { EditUser((MainPage)page); });
@@ -333,6 +359,124 @@ namespace DDEvernote.WPF.ViewModels
                 { DenyShareNote(SelectedNote.Id); }
             });
             EditCategoryCommand = new Command((category) => { EditCategory((Category)category); });
+            UnloadPageCommand = new Command(() => { Connection_Closed(); });
+        }
+
+        private async void ConnectToHubAsync()
+        {
+            ResourceManager rm = new ResourceManager("DDEvernote.WPF.ConnectionResource",
+                            Assembly.GetExecutingAssembly());
+            string ServerURI = rm.GetString("ServerURI");
+            Connection = new HubConnection(ServerURI);
+            Connection.Closed += Connection_Closed;
+            HubProxy = Connection.CreateHubProxy("ServerHub");
+            HubProxy.On<Guid>("UpdateNotes", (noteId) => { OnUpdateNotes(noteId); });
+            HubProxy.On<Guid>("DeleteNotes", (noteId) => { OnDeleteNotes(noteId); });
+            try
+            {
+                await Connection.Start();
+            }
+            catch (HttpRequestException)
+            {
+
+            }
+            await HubProxy.Invoke("Connect", User.Id);
+        }
+
+        private void OnDeleteNotes(Guid noteId)
+        {
+            var dispatcher = Application.Current.Dispatcher;
+
+            var note = UserNotes.FirstOrDefault(n => n.Id == noteId);
+            if (note != null)
+            {
+                dispatcher.Invoke(() =>
+                {
+                    UserNotes.Remove(note);
+                    if (SelectedNote != null && SelectedNote.Id == noteId)
+                    {
+                        VisibilityPropertyOfNote = Visibility.Hidden;
+                    }
+                });
+            }
+        }
+        private void OnUpdateNotes(Guid noteId)
+        {
+            var dispatcher = Application.Current.Dispatcher;
+            var UpdatedNote = GetNote(noteId);
+
+            var note = UserNotes.FirstOrDefault(n => n.Id == noteId);
+            List<Note> tmpList;
+            if (note != null)
+            {
+                note.Title = UpdatedNote.Title;
+                note.Text = UpdatedNote.Text;
+                note.Changed = UpdatedNote.Changed;
+                note.Categories = UpdatedNote.Categories;
+                note.Shared = UpdatedNote.Shared;
+                tmpList = UserNotes.ToList();
+                UserNotes = new ObservableCollection<Note>(tmpList);
+                if (SelectedNote != null && SelectedNote.Id == note.Id)
+                {
+                    SelectedNote = note;
+                }
+                OnPropertyChanged("SelectedNote");
+            }
+            else
+            {
+                dispatcher.Invoke(() => UserNotes.Add(UpdatedNote));
+            }
+            OnPropertyChanged("UserNotes");
+        }
+        private void SendUpdate(Note note)
+        {
+            var noteToSend = new Note { Id = note.Id, Owner = new User { Id = note.Owner.Id } };
+            var listNoteToSendShared = new List<User>();
+            foreach (var user in note.Shared)
+            {
+                listNoteToSendShared.Add(new User { Id = user.Id });
+            }
+            noteToSend.Shared = listNoteToSendShared;
+            bool sendToOwner = this._user.Id != note.Owner.Id;
+            if (Connection.State != ConnectionState.Connected)
+            {
+                Connection.Start();
+            }
+            HubProxy.Invoke("SendUpdate", noteToSend, sendToOwner);
+        }
+        private void SendDelete(Note note)
+        {
+            var noteToSend = new Note { Id = note.Id, Owner = new User { Id = note.Owner.Id } };
+            var listNoteToSendShared = new List<User>();
+            foreach (var user in note.Shared)
+            {
+                listNoteToSendShared.Add(new User { Id = user.Id });
+            }
+            noteToSend.Shared = listNoteToSendShared;
+            bool sendToOwner = this._user.Id != note.Owner.Id;
+            if (Connection.State != ConnectionState.Connected)
+            {
+                Connection.Start();
+            }
+            HubProxy.Invoke("SendDelete", noteToSend, sendToOwner);
+        }
+        private void SendUpdateIdNote(Guid noteId)
+        {
+            var note = UserNotes.Where(n => n.Id == noteId).Single();
+            SendUpdate(note);
+        }
+        private void SendDeleteIdNote(Guid noteId)
+        {
+            var note = UserNotes.Where(n => n.Id == noteId).Single();
+            SendDelete(note);
+        }
+        private void Connection_Closed()
+        {
+            if (Connection != null)
+            {
+                Connection.Stop();
+                Connection.Dispose();
+            }
         }
 
         private void CreateNote()
@@ -373,6 +517,7 @@ namespace DDEvernote.WPF.ViewModels
         }
         private void LogOut(MainPage page)
         {
+            Connection_Closed();
             ((MainWindow)page.Parent).Content = new LoginPage();
         }
         private void SelectNote(Note note)
@@ -398,6 +543,11 @@ namespace DDEvernote.WPF.ViewModels
                       if (((ModelNoteWindow)noteWin.DataContext).IsDeleted)
                       {
                           UserNotes.Remove(UserNotes.Where(n => n.Id == note.Id).Single());
+                          SendDelete(note);
+                      }
+                      else
+                      {
+                          SendUpdate(note);
                       }
                   };
                 noteWin.ShowDialog();
@@ -419,7 +569,21 @@ namespace DDEvernote.WPF.ViewModels
         private void DeleteNote(Guid noteId)
         {
             _client.DeleteNote(noteId);
+            var tmpNote = UserNotes.Where(n => n.Id == noteId).FirstOrDefault();
             UserNotes.Remove(UserNotes.Where(n => n.Id == noteId).Single());
+            var noteToSend = new Note { Id = noteId, Owner = new User { Id = tmpNote.Owner.Id } };
+            var listNoteToSendShared = new List<User>();
+            foreach (var user in tmpNote.Shared)
+            {
+                listNoteToSendShared.Add(new User { Id = user.Id });
+            }
+            noteToSend.Shared = listNoteToSendShared;
+            bool sendToOwner = false;
+            if (tmpNote != null)
+            {
+                sendToOwner = this._user.Id != tmpNote.Owner.Id;
+            }
+            HubProxy.Invoke("SendDelete", noteToSend, sendToOwner);
             if (NotesOfSelectedCategory.Count > 0 && NotesOfSelectedCategory.Contains(NotesOfSelectedCategory.Where(n => n.Id == noteId).Single()))
             {
                 NotesOfSelectedCategory.Remove(NotesOfSelectedCategory.Where(n => n.Id == noteId).Single());
@@ -431,6 +595,13 @@ namespace DDEvernote.WPF.ViewModels
         }
         private void DeleteCategory(Category category)
         {
+            foreach (var note in UserNotes)
+            {
+                if (note.Categories.Where(c => c.Id == category.Id).Count() == 1)
+                {
+                    SendUpdate(note);
+                }
+            }
             _client.DeleteCategory(category.Id);
             UserCategories.Remove(category);
         }
@@ -524,19 +695,23 @@ namespace DDEvernote.WPF.ViewModels
             _client.DenyShareNote(noteId, _selectedUser.Id);
             NotesOfSelectedUser.Remove(NotesOfSelectedUser.Where(n => n.Id == noteId).Single());
             UserNotes = new ObservableCollection<Note>(getNotes(_user.Id));
+
+            var tmpListUsersGuid = new List<Guid>();
+            tmpListUsersGuid.Add(_selectedUser.Id);
+            HubProxy.Invoke("RemoveNote", tmpListUsersGuid, new Note { Id = noteId }, false);
         }
 
         private void PickCategoriesToAddNote(Note note)
         {
             var selectedCategories = GetCategoriesByNote(note.Id);
             var ansList = new List<GeneralType>();
-            foreach (var category in _userCategories.Where(u => u.Id != _user.Id))
+            foreach (var category in selectedCategories)
             {
-                if (selectedCategories.Where(u => u.Id == category.Id).Count() == 1)
-                {
-                    ansList.Add(new GeneralType { Id = category.Id, Title = category.Title, IsSelected = true });
-                }
-                else
+                ansList.Add(new GeneralType { Id = category.Id, Title = category.Title, IsSelected = true });
+            }
+            foreach (var category in _userCategories)
+            {
+                if (selectedCategories.Where(c => c.Id == category.Id).Count() == 0)
                 {
                     ansList.Add(new GeneralType { Id = category.Id, Title = category.Title, IsSelected = false });
                 }
@@ -575,6 +750,7 @@ namespace DDEvernote.WPF.ViewModels
                     }
                 }
                 SelectedNote = _client.GetNote(SelectedNote.Id);
+                SendUpdate(note);
             };
             pickWindow.ShowDialog();
         }
@@ -604,6 +780,7 @@ namespace DDEvernote.WPF.ViewModels
                         if (NotesOfSelectedCategory.Where(n => n.Id == note.Id).Count() == 0)
                         {
                             tmpAddNotesInCategory.Add(note.Id);
+                            SendUpdateIdNote(note.Id);
                         }
                     }
 
@@ -612,6 +789,7 @@ namespace DDEvernote.WPF.ViewModels
                         if (((ModelPickItems)pickWindow.DataContext).SelectedItems.Where(n => n.Id == note.Id).Count() == 0)
                         {
                             tmpDeleteNotesFromCategory.Add(note.Id);
+                            SendUpdateIdNote(note.Id);
                         }
                     }
                 }
@@ -643,26 +821,30 @@ namespace DDEvernote.WPF.ViewModels
             {
                 var tmpShareNoteToUser = new List<Guid>();
                 var tmpDenyShareNoteToUser = new List<Guid>();
-                if (((ModelPickItems)pickWindow.DataContext).SelectedItems != null)
+                var selectedItems = ((ModelPickItems)pickWindow.DataContext).SelectedItems;
+                if (selectedItems != null)
                 {
-                    foreach (var note in ((ModelPickItems)pickWindow.DataContext).SelectedItems)
+                    foreach (var note in selectedItems)
                     {
                         if (NotesOfSelectedUser.Where(n => n.Id == note.Id).Count() == 0)
                         {
                             tmpShareNoteToUser.Add(note.Id);
+                            //SendUpdateIdNote(note.Id);
                         }
                     }
 
                     foreach (var note in NotesOfSelectedUser)
                     {
-                        if (((ModelPickItems)pickWindow.DataContext).SelectedItems.Where(n => n.Id == note.Id).Count() == 0)
+                        if (selectedItems.Where(n => n.Id == note.Id).Count() == 0)
                         {
                             tmpDenyShareNoteToUser.Add(note.Id);
+                            //SendDeleteIdNote(note.Id);
                         }
                     }
                 }
                 ShareNotesToUser(tmpShareNoteToUser, user.Id);
                 DenyShareNotesToUser(tmpDenyShareNoteToUser, user.Id);
+
 
                 NotesOfSelectedUser = new ObservableCollection<Note>(GetSharedNotesByTwoUser(user.Id));
                 UserNotes = new ObservableCollection<Note>(getNotes(_user.Id));
@@ -710,6 +892,12 @@ namespace DDEvernote.WPF.ViewModels
                 }
                 ShareNote(tmpShare, note.Id);
                 DenyShareNote(tmpDenyShare, note.Id);
+
+                bool sendToOwner = this._user.Id != note.Owner.Id;
+                var tmpNote = new Note { Id = note.Id, Owner = new User { Id = note.Owner.Id } };
+                HubProxy.Invoke("AddNote", tmpShare, tmpNote, sendToOwner);
+                HubProxy.Invoke("RemoveNote", tmpDenyShare, tmpNote, sendToOwner);
+
                 foreach (var userNote in UserNotes)
                 {
                     if (userNote.Id == note.Id)
@@ -723,6 +911,10 @@ namespace DDEvernote.WPF.ViewModels
             pickWindow.ShowDialog();
         }
 
+        private Note GetNote(Guid noteId)
+        {
+            return _client.GetNote(noteId);
+        }
         private IEnumerable<Note> getNotes(Guid userId)
         {
             return _client.GetNotes(userId).Concat(_client.GetSharedNotesByUser(userId));

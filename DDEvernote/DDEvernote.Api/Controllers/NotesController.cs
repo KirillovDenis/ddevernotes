@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using DDEvernote.Model;
 using DDEvernote.DataLayer;
 using DDEvernote.DataLayer.Sql;
 using DDEvernote.Api.Filters;
+using System.Web.Configuration;
 
 namespace DDEvernote.Api.Controllers
 {
@@ -16,7 +14,7 @@ namespace DDEvernote.Api.Controllers
     /// </summary>
     public class NotesController : ApiController
     {
-        private const string _connectionString = @"Server=DENIS-2;Database=ddevernotes;Trusted_Connection=true;";
+        private readonly string _connectionString = WebConfigurationManager.ConnectionStrings["DBConnectionString"].ConnectionString;
         private readonly INotesRepository _notesRepository;
         private readonly NLog.Logger _logger;
 

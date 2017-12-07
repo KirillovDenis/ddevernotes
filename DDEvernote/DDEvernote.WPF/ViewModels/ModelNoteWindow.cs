@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
+using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,7 +46,10 @@ namespace DDEvernote.WPF.ViewModels
 
         public ModelNoteWindow(Note note)
         {
-            _serviceclient = new ServiceClient("http://localhost:52395/api/");
+            ResourceManager rm = new ResourceManager("DDEvernote.WPF.ConnectionResource",
+                            Assembly.GetExecutingAssembly());
+            string connString = rm.GetString("ConnectionString");
+            _serviceclient = new ServiceClient(connString);
             this.Note = note;
             IsDeleted = false;
 

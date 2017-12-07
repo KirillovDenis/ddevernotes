@@ -22,5 +22,6 @@ namespace DDEvernote.DataLayer
         IEnumerable<Note> GetSharedNotesByUser(Guid userId);
         IEnumerable<Note> GetNotesBySharedUser(Guid ownerUserId, Guid sharedUserId);
         bool IsExist(Guid noteId);
+        IEnumerable<Guid> GetUserNotify(Guid noteId);
     }
 }
